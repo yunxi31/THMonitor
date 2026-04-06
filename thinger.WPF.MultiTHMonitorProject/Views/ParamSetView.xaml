@@ -1,0 +1,1458 @@
+﻿<UserControl
+    x:Class="thinger.WPF.MultiTHMonitorProject.Views.ParamSetView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:comm="clr-namespace:thinger.WPF.MultiTHMonitorProject.Command"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:thinger.WPF.MultiTHMonitorProject.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="SiteButton" TargetType="Button">
+            <Setter Property="Width" Value="148" />
+            <Setter Property="Margin" Value="0,0,20,0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="#00b9c3" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="#000000" />
+        </Style>
+        <Style x:Key="CheckBoxStyle" TargetType="{x:Type CheckBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource CheckBoxFocusVisual}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <BulletDecorator>
+                            <BulletDecorator.Bullet>
+                                <Grid Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                                    <Border x:Name="Border">
+                                        <Rectangle
+                                            Fill="DodgerBlue"
+                                            RadiusX="5"
+                                            RadiusY="5" />
+                                    </Border>
+                                    <Grid x:Name="CheckedMark">
+                                        <Path
+                                            Width="14"
+                                            Height="14"
+                                            Data="M1,6 L7,12"
+                                            SnapsToDevicePixels="False"
+                                            StrokeThickness="2"
+                                            Visibility="Visible">
+                                            <Path.Stroke>
+                                                <SolidColorBrush Color="White" />
+                                            </Path.Stroke>
+                                        </Path>
+                                        <Path
+                                            Width="14"
+                                            Height="14"
+                                            Data="M6,12 L14,2"
+                                            SnapsToDevicePixels="False"
+                                            StrokeThickness="2"
+                                            Visibility="Visible">
+                                            <Path.Stroke>
+                                                <SolidColorBrush Color="White" />
+                                            </Path.Stroke>
+                                        </Path>
+                                    </Grid>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CheckStates">
+                                    <VisualState x:Name="Checked">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckedMark" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unchecked">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckedMark" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Indeterminate">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckedMark" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </BulletDecorator>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <comm:MultiBindingConverter x:Key="MultiBindingConverter" />
+    </UserControl.Resources>
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Border
+            Background="#070b40"
+            BorderBrush="#1d2f85"
+            BorderThickness="2">
+            <StackPanel Orientation="Horizontal">
+                <Border
+                    Width="130"
+                    Height="40"
+                    Margin="20"
+                    Background="#00cafd"
+                    CornerRadius="15">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="White"
+                        Text="通信配置" />
+                </Border>
+                <TextBox
+                    MaxWidth="400"
+                    Margin="10,0,0,0"
+                    Padding="10"
+                    VerticalAlignment="Center"
+                    materialDesign:HintAssist.Foreground="#17c6cd"
+                    materialDesign:HintAssist.Hint="请输入设备IP地址"
+                    materialDesign:TextFieldAssist.UnderlineBrush="#17c6cd"
+                    Background="#e6eceb"
+                    BorderBrush="#00b9c3"
+                    FontSize="14"
+                    Text="{Binding IPAddress}" />
+                <TextBox
+                    Height="40"
+                    MaxWidth="400"
+                    Margin="15,0,0,0"
+                    Padding="10"
+                    materialDesign:HintAssist.Foreground="#17c6cd"
+                    materialDesign:HintAssist.Hint="请输入设备端口号"
+                    materialDesign:TextFieldAssist.UnderlineBrush="#17c6cd"
+                    Background="#e6eceb"
+                    BorderBrush="#00b9c3"
+                    FontSize="14"
+                    Text="{Binding Port}" />
+                <Button
+                    Width="120"
+                    Height="40"
+                    Margin="15,0,0,0"
+                    materialDesign:RippleAssist.Feedback="#DD000000"
+                    Background="#04a9f3"
+                    BorderBrush="#04a9f3"
+                    Command="{Binding ConfirmSetCommand}"
+                    Content="确定设置"
+                    Cursor="Hand"
+                    FontSize="16"
+                    Foreground="#fff"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+                <Button
+                    Width="120"
+                    Height="40"
+                    Margin="15,0,0,0"
+                    materialDesign:RippleAssist.Feedback="#DD000000"
+                    Background="#fa9779"
+                    BorderBrush="#fa9779"
+                    Command="{Binding CancelSetCommand}"
+                    Content="取消设置"
+                    FontSize="16"
+                    Foreground="#fff"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+                <Button
+                    Width="120"
+                    Height="40"
+                    Margin="15,0,0,0"
+                    materialDesign:RippleAssist.Feedback="#DD000000"
+                    Background="#f36ea8"
+                    BorderBrush="#f36ea8"
+                    Command="{Binding OpenGroupViewCommand}"
+                    CommandParameter="GroupConifgView"
+                    Content="通信组配置"
+                    FontSize="16"
+                    Foreground="#fff"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+                <Button
+                    Width="120"
+                    Height="40"
+                    Margin="15,0,0,0"
+                    materialDesign:RippleAssist.Feedback="#DD000000"
+                    Background="#f36ea8"
+                    BorderBrush="#f36ea8"
+                    Command="{Binding OpenVariableViewCommand}"
+                    CommandParameter="VariableConfigView"
+                    Content="变量配置"
+                    FontSize="16"
+                    Foreground="#fff"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+            </StackPanel>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="0,20,0,0"
+            Background="#070b40"
+            BorderBrush="#1d2f85"
+            BorderThickness="2">
+            <UniformGrid Columns="3" Rows="2">
+                <StackPanel Margin="20,0,0,0">
+                    <Border
+                        Width="130"
+                        Height="40"
+                        Margin="0,20,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#00e4ff"
+                        CornerRadius="15">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="1#站点" />
+                    </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_H1"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_H1"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块1温度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_H1" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_H1" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_H1" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_H1"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHTemp01}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHTemp01}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_L1"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_L1"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块1温度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_L1" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_L1" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_L1" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_L1"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLTemp01}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLTemp01}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_H1"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_H1"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块1湿度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_H1" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_H1" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_H1" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_H1"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHHum01}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="#98df44"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="3"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_L1"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_L1"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块1湿度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_L1" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_L1" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_L1" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_L1"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLHum01}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="#98df44"
+                                CornerRadius="10" />
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <CheckBox
+                            Background="#ff992c"
+                            Content="温度报警启用"
+                            FontSize="16"
+                            Foreground="#ff992c"
+                            IsChecked="{Binding IsAlarmTemp01}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="100,0,0,0"
+                            Background="#00f7ec"
+                            Content="湿度报警启用"
+                            FontSize="16"
+                            Foreground="#00f7ec"
+                            IsChecked="{Binding IsAlarmHum01}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Margin="70,0,0,0">
+                    <Border
+                        Width="130"
+                        Height="40"
+                        Margin="0,20,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#00e4ff"
+                        CornerRadius="15">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="2#站点" />
+                    </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_H2"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_H2"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块2温度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_H2" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_H2" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_H2" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_H2"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHTemp02}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHTemp02}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_L2"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_L2"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块2温度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_L2" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_L2" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_L2" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_L2"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLTemp02}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLTemp02}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_H2"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_H2"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块2湿度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_H2" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_H2" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_H2" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_H2"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHHum02}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHHum02}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="3"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_L2"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_L2"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块2湿度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_L2" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_L2" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_L2" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_L2"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLHum02}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLHum02}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <CheckBox
+                            Background="#ff992c"
+                            Content="温度报警启用"
+                            FontSize="16"
+                            Foreground="#ff992c"
+                            IsChecked="{Binding IsAlarmTemp02}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="100,0,0,0"
+                            Background="#00f7ec"
+                            Content="湿度报警启用"
+                            FontSize="16"
+                            Foreground="#00f7ec"
+                            IsChecked="{Binding IsAlarmHum02}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Margin="120,0,0,0">
+                    <Border
+                        Width="130"
+                        Height="40"
+                        Margin="0,20,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#00e4ff"
+                        CornerRadius="15">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="3#站点" />
+                    </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_H3"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_H3"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块3温度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_H3" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_H3" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_H3" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_H3"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHTemp03}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHTemp03}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_L3"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_L3"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块3温度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_L3" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_L3" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_L3" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_L3"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLTemp03}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLTemp03}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_H3"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_H3"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块3湿度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_H3" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_H3" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_H3" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_H3"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHHum03}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHHum03}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="3"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_L3"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_L3"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块3湿度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_L3" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_L3" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_L3" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_L3"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLHum03}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLHum03}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <CheckBox
+                            Background="#ff992c"
+                            Content="温度报警启用"
+                            FontSize="16"
+                            Foreground="#ff992c"
+                            IsChecked="{Binding IsAlarmTemp03}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="100,0,0,0"
+                            Background="#00f7ec"
+                            Content="湿度报警启用"
+                            FontSize="16"
+                            Foreground="#00f7ec"
+                            IsChecked="{Binding IsAlarmHum03}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Margin="20,0,0,0">
+                    <Border
+                        Width="130"
+                        Height="40"
+                        Margin="0,20,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#00e4ff"
+                        CornerRadius="15">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="4#站点" />
+                    </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_H4"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_H4"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块4温度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_H4" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_H4" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_H4" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_H4"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHTemp04}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHTemp04}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_L4"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_L4"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块4温度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_L4" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_L4" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_L4" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_L4"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLTemp04}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLTemp04}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_H4"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_H4"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块4湿度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_H1" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_H1" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_H1" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_H4"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHHum04}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHHum04}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="3"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_L4"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_L4"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块4湿度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_L4" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_L4" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_L4" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+
+                            <TextBlock
+                                Name="txt_SiteHumValue_L4"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLHum04}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLHum04}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <CheckBox
+                            Background="#ff992c"
+                            Content="温度报警启用"
+                            FontSize="16"
+                            Foreground="#ff992c"
+                            IsChecked="{Binding IsAlarmTemp04}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="100,0,0,0"
+                            Background="#00f7ec"
+                            Content="湿度报警启用"
+                            FontSize="16"
+                            Foreground="#00f7ec"
+                            IsChecked="{Binding IsAlarmHum04}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Margin="70,0,0,0">
+                    <Border
+                        Width="130"
+                        Height="40"
+                        Margin="0,20,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#00e4ff"
+                        CornerRadius="15">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="5#站点" />
+                    </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_H5"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_H5"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块5温度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_H5" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_H5" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_H5" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_H5"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHTemp05}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHTemp05}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_L5"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_L5"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块5温度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <!--  CommandParameter="ModifyParamSetView"  -->
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_L5" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_L5" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_L5" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_L5"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLTemp05}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLTemp05}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_H5"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_H5"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块5湿度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_H5" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_H5" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_H5" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_H5"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHHum05}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHHum05}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="3"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_L5"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_L5"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块5湿度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_L5" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_L5" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_L5" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_L5"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLHum05}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLHum05}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <CheckBox
+                            Background="#ff992c"
+                            Content="温度报警启用"
+                            FontSize="16"
+                            Foreground="#ff992c"
+                            IsChecked="{Binding IsAlarmTemp05}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="100,0,0,0"
+                            Background="#00f7ec"
+                            Content="湿度报警启用"
+                            FontSize="16"
+                            Foreground="#00f7ec"
+                            IsChecked="{Binding IsAlarmHum05}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Margin="120,0,0,0">
+                    <Border
+                        Width="130"
+                        Height="40"
+                        Margin="0,20,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#00e4ff"
+                        CornerRadius="15">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="White"
+                            Text="6#站点" />
+                    </Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_H6"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_H6"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块6温度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_H6" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_H6" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_H6" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_H6"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHTemp06}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHTemp06}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteTempName_L6"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteTemp_L6"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块6温度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteTempName_L6" Path="Text" />
+                                        <Binding ElementName="btn_SiteTemp_L6" Path="Content" />
+                                        <Binding ElementName="txt_SiteTempValue_L6" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteTempValue_L6"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLTemp06}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLTemp06}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_H6"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_H6"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块6湿度高限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_H6" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_H6" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_H6" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_H6"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateHHum06}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmHHum06}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Row="3"
+                            Margin="0,20,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Name="txt_SiteHumName_L6"
+                                Width="0"
+                                Text="ModifyParamSetView"
+                                Visibility="Hidden" />
+                            <Button
+                                Name="btn_SiteHum_L6"
+                                Width="148"
+                                Margin="0,0,20,0"
+                                Background="Transparent"
+                                BorderBrush="#00e4ff"
+                                BorderThickness="1"
+                                Command="{Binding OpenModifyParamSetViewCommand}"
+                                Content="模块6湿度低限"
+                                Cursor="Hand"
+                                Foreground="#20cefa">
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MultiBindingConverter}">
+                                        <Binding ElementName="txt_SiteHumName_L6" Path="Text" />
+                                        <Binding ElementName="btn_SiteHum_L6" Path="Content" />
+                                        <Binding ElementName="txt_SiteHumValue_L6" Path="Text" />
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                            <TextBlock
+                                Name="txt_SiteHumValue_L6"
+                                Width="180"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#eaf9da"
+                                Text="{Binding StateLHum06}"
+                                TextAlignment="Center" />
+                            <Border
+                                Width="20"
+                                Height="20"
+                                Background="{Binding LedAlarmLHum06}"
+                                CornerRadius="10" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <CheckBox
+                            Background="#ff992c"
+                            Content="温度报警启用"
+                            FontSize="16"
+                            Foreground="#ff992c"
+                            IsChecked="{Binding IsAlarmTemp06}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="100,0,0,0"
+                            Background="#00f7ec"
+                            Content="湿度报警启用"
+                            FontSize="16"
+                            Foreground="#00f7ec"
+                            IsChecked="{Binding IsAlarmHum06}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                    </StackPanel>
+                </StackPanel>
+            </UniformGrid>
+        </Border>
+    </Grid>
+</UserControl>

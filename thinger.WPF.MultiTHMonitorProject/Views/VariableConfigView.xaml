@@ -1,0 +1,494 @@
+﻿<UserControl
+    x:Class="thinger.WPF.MultiTHMonitorProject.Views.VariableConfigView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behavior="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:thinger.WPF.MultiTHMonitorProject.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="#05092e"
+    mc:Ignorable="d">
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="ResizeMode" Value="NoResize" />
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome GlassFrameThickness="-10" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <Grid Margin="25,0,25,25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button
+                x:Name="btnClose"
+                Grid.Column="1"
+                Width="50"
+                Height="50"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{Binding LogoutCommand}"
+                CommandParameter="{Binding}"
+                Content="✕"
+                FontSize="18"
+                Foreground="White" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="#070b40">
+            <GroupBox
+                materialDesign:ColorZoneAssist.Background="#1d2f86"
+                materialDesign:ColorZoneAssist.Foreground="#00e4ff"
+                materialDesign:ColorZoneAssist.Mode="Custom"
+                FontSize="16"
+                Foreground="#00e4ff"
+                Header="变量信息配置"
+                Style="{StaticResource MaterialDesignGroupBox}">
+                <Grid HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <StackPanel
+                        Margin="15"
+                        Background="Transparent"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="通信组" />
+                        <ComboBox
+                            Padding="9"
+                            materialDesign:HintAssist.Hint="-----通信组选择-----"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            ItemsSource="{Binding GroupNames, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding SelectGroupName}" />
+                        <TextBlock
+                            Margin="20,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="变量名称" />
+                        <TextBox
+                            MaxWidth="400"
+                            Padding="10"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#DD000000"
+                            materialDesign:HintAssist.Hint="请输入变量名"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            AcceptsReturn="True"
+                            Background="#e6eceb"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#DD000000"
+                            Text="{Binding VarName}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="20,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="起始索引" />
+                        <TextBox
+                            MaxWidth="400"
+                            Padding="10"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#00e4ff"
+                            materialDesign:HintAssist.Hint="请输入起始索引"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            AcceptsReturn="True"
+                            Background="#e6eceb"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#DD000000"
+                            Text="{Binding Start}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="20,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="位偏移/长度" />
+                        <TextBox
+                            MaxWidth="400"
+                            Padding="10"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#00e4ff"
+                            materialDesign:HintAssist.Hint="请输入位偏移/长度"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            AcceptsReturn="True"
+                            Background="#e6eceb"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#DD000000"
+                            Text="{Binding OffsetOrLength}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="20,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="数据类型" />
+                        <ComboBox
+                            Padding="9"
+                            materialDesign:HintAssist.Hint="-----数据类型选择-----"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            ItemsSource="{Binding DataTypes, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding SelectDataType}" />
+                        <TextBlock
+                            Margin="20,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="线性系数" />
+                        <TextBox
+                            Padding="10"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#00e4ff"
+                            materialDesign:HintAssist.Hint="线性系数"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            AcceptsReturn="True"
+                            Background="#e6eceb"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#DD000000"
+                            Text="{Binding Scale}"
+                            TextWrapping="Wrap" />
+
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="1"
+                        Margin="15"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="偏移量" />
+                        <TextBox
+                            Padding="10"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#00e4ff"
+                            materialDesign:HintAssist.Hint="偏移量"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            AcceptsReturn="True"
+                            Background="#e6eceb"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#DD000000"
+                            Text="{Binding 偏移量}"
+                            TextWrapping="Wrap" />
+                        <CheckBox
+                            Margin="15,0,0,0"
+                            Background="#00e4ff"
+                            Content="上升沿报警"
+                            Foreground="#00e4ff"
+                            IsChecked="{Binding PosAlarm}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <CheckBox
+                            Margin="15,0,0,0"
+                            Background="#00e4ff"
+                            Content="下降沿报警"
+                            Foreground="#00e4ff"
+                            IsChecked="{Binding NegAlarm}"
+                            Style="{DynamicResource CheckBoxStyle1}" />
+                        <TextBlock
+                            Margin="20,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#00e4ff"
+                            Text="备注说明" />
+                        <TextBox
+                            MaxWidth="400"
+                            Padding="10"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Foreground="#00e4ff"
+                            materialDesign:HintAssist.Hint="请输入备注信息"
+                            materialDesign:TextFieldAssist.UnderlineBrush="#00e4ff"
+                            AcceptsReturn="True"
+                            Background="#e6eceb"
+                            BorderBrush="#00e4ff"
+                            FontSize="14"
+                            Foreground="#DD000000"
+                            Text="{Binding Remark}"
+                            TextWrapping="Wrap" />
+                        <Button
+                            Height="40"
+                            Margin="15,0,0,0"
+                            materialDesign:RippleAssist.Feedback="#DD000000"
+                            Background="#04a9f3"
+                            BorderBrush="#04a9f3"
+                            Command="{Binding AddVarCommand}"
+                            Content="新增变量"
+                            FontSize="16"
+                            Foreground="#fff"
+                            Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+
+                        <Button
+                            Height="40"
+                            Margin="15,0,0,0"
+                            materialDesign:RippleAssist.Feedback="#DD000000"
+                            Background="#02c294"
+                            BorderBrush="#02c294"
+                            Command="{Binding ModifyVarCommand}"
+                            CommandParameter="{Binding VarName}"
+                            Content="修改变量"
+                            FontSize="16"
+                            Foreground="#fff"
+                            Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </Border>
+        <Border
+            Grid.Row="2"
+            Margin="0,20,0,0"
+            Background="#070b40"
+            BorderBrush="#1d2f85"
+            BorderThickness="2">
+            <DataGrid
+                Name="dataGridGroupList"
+                Margin="20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                AutoGenerateColumns="False"
+                Background="Transparent"
+                BorderThickness="0"
+                CanUserAddRows="False"
+                CanUserResizeColumns="True"
+                FontSize="16"
+                ItemsSource="{Binding VarsList}"
+                SelectionMode="Single">
+                <DataGrid.Style>
+                    <Style TargetType="DataGrid">
+                        <!--  网格线颜色  -->
+                        <Setter Property="CanUserResizeColumns" Value="false" />
+                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+                        <Setter Property="HeadersVisibility" Value="Column" />
+                        <Setter Property="HorizontalGridLinesBrush">
+                            <Setter.Value>
+                                <SolidColorBrush Color="#0a145e" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="VerticalGridLinesBrush">
+                            <Setter.Value>
+                                <SolidColorBrush Color="Transparent" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Style>
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Foreground" Value="#9ec7ff" />
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <!--<Setter Property="Background" Value="#001f55"></Setter>-->
+                        <Setter Property="Foreground" Value="#1db4e1" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Setter Property="BorderBrush" Value="#0a145e" />
+                        <Setter Property="Height" Value="70" />
+                        <Setter Property="FontSize" Value="14" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush>
+                                    <GradientStop Offset="0" Color="#0a145e" />
+                                    <GradientStop Offset="1" Color="#070b40" />
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Height" Value="50" />
+                        <Setter Property="Foreground" Value="#9ec7ff" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush>
+                                            <GradientStop Offset="0" Color="#5f3bbe" />
+                                            <GradientStop Offset="1" Color="#070b40" />
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="BorderBrush" Value="#0a145e" />
+                                <Setter Property="BorderThickness" Value="0,0,0,1" />
+                                <Setter Property="Foreground" Value="#9ec7ff" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="50*" Header="变量名称">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding VarName}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="起始索引">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Start}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="位偏移/长度">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding OffsetOrLength}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="数据类型">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding DataType}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="线性系数">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Scale}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="偏移量">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Offset}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="上升沿">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding PosAlarmValue}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="下降沿">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding NegAlarmValue}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="通信组">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding GroupName}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="备注">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Remark}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="50*" Header="操作">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <Button
+                                        Background="#a42fc9"
+                                        BorderBrush="#a42fc9"
+                                        Command="{Binding DataContext.DeleteVarCommand, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                        CommandParameter="{Binding VarName}"
+                                        Content="删除变量"
+                                        Style="{StaticResource MaterialDesignRaisedDarkButton}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <behavior:Interaction.Triggers>
+                    <behavior:EventTrigger EventName="SelectionChanged">
+                        <behavior:InvokeCommandAction Command="{Binding SelectRowCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" />
+                    </behavior:EventTrigger>
+                </behavior:Interaction.Triggers>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

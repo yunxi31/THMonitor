@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+	  <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Images\header.jpg" />
+    <None Remove="Images\header_bg.png" />
+    <None Remove="Images\login_bg.png" />
+    <None Remove="Images\logo.png" />
+    <None Remove="Images\logo_icon.png" />
+    <None Remove="Images\t_bg.png" />
+    <None Remove="Images\t_bg_1.png" />
+    <None Remove="Images\t_bg_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Collapsenav.Net.Tool.Excel.MiniExcel" Version="1.3.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0-preview1" />
+    <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.601" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.601" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.601" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.6.1" />
+    <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\thinger.DataConvertLib\thinger.DataConvertLib.csproj" />
+    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorBLL\thinger.WPF.MultiTHMonitorBLL.csproj" />
+    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorDAL\thinger.WPF.MultiTHMonitorDAL.csproj" />
+    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorHelper\thinger.WPF.MultiTHMonitorHelper.csproj" />
+    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorModels\thinger.WPF.MultiTHMonitorModels.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\header.jpg" />
+    <Resource Include="Images\header_bg.png" />
+    <Resource Include="Images\login_bg.png" />
+    <Resource Include="Images\logo.png" />
+    <Resource Include="Images\logo_icon.png" />
+    <Resource Include="Images\t_bg.png" />
+    <Resource Include="Images\t_bg_1.png" />
+    <Resource Include="Images\t_bg_2.png" />
+  </ItemGroup>
+</Project>

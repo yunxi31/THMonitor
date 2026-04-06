@@ -1,0 +1,45 @@
+﻿<UserControl
+    x:Class="thinger.WPF.MultiTHMonitorProject.Views.ModifyParamSetView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:thinger.WPF.MultiTHMonitorProject.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <StackPanel Width="500" Height="230" Background="#05082e" >
+        <StackPanel Margin="10" Orientation="Horizontal">
+            <TextBlock
+                Margin="150,0,10,0"
+                FontSize="16"
+                Text="参数名称" Foreground="#00a3f8" />
+            <TextBlock Foreground="#00a3f8" FontSize="16" Text="{Binding SiteName}" />
+        </StackPanel>
+        <StackPanel Margin="10" Orientation="Horizontal">
+            <TextBlock
+               Margin="150,0,10,0"
+                FontSize="16"
+                Text="当前参数" Foreground="#00a3f8"/>
+            <TextBlock FontSize="16" Foreground="#00a3f8" Text="{Binding SiteValue}"  materialDesign:TextFieldAssist.UnderlineBrush="#fff" />
+        </StackPanel>
+        <StackPanel Margin="10" Orientation="Horizontal">
+            <TextBlock
+                Margin="150,0,10,0"
+                FontSize="16"
+                Text="修改参数" Foreground="#00a3f8" />
+            <TextBox FontSize="16" Foreground="#00a3f8" Text="{Binding NewSiteValue}" />
+        </StackPanel>
+        <StackPanel Margin="20" Orientation="Horizontal">
+            <Button
+                Margin="150,0,10,0"
+                Content="确定"
+                FontSize="16" Command="{Binding ConfirmCommand}" />
+            <Button
+                Margin="40,0,0,0"
+                Content="取消"
+                FontSize="16" Command="{Binding CancelCommand}" Cursor="Hand" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>
