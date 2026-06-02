@@ -1,4 +1,4 @@
-﻿using Prism.Commands;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -844,10 +844,10 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         #region 方法
         private void ExeConfirmSet()
         {
-            string devPath = Environment.CurrentDirectory + "\\Config\\Device.ini";
+            string devPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Device.ini";
             if (!File.Exists(devPath))
             {
-                var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Device.ini");
+                var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Device.ini");
                 bool result = IniConfigHelper.WriteIniData("设备参数", "IP地址", IPAddress, devPath);
                 result &= IniConfigHelper.WriteIniData("设备参数", "d端口号", Port.ToString(), devPath);
                 if (result)

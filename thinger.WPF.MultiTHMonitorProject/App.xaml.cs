@@ -1,4 +1,4 @@
-﻿using Prism.Ioc;
+using Prism.Ioc;
 using Prism.Services.Dialogs;
 using System;
 using System.Windows;
@@ -24,7 +24,7 @@ namespace thinger.WPF.MultiTHMonitorProject
         //使用依赖注入，注入对应的视图模块
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterForNavigation<LoginView, LoginViewModel>();
+            containerRegistry.RegisterDialog<LoginView, LoginViewModel>();
             containerRegistry.RegisterForNavigation<MonitorView, MonitorViewModel>();
             containerRegistry.RegisterForNavigation<ParamSetView, ParamSetViewModel>();
             containerRegistry.RegisterForNavigation<RecipeView, RecipeViewModel>();

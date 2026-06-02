@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs;
+using MiniExcelLibs;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -43,13 +43,13 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         //private CommonDataMethods dataMethods = new CommonDataMethods();
         public List<OperateLog> AddLog=new List<OperateLog>();
         //设备参数路径
-        private string devicePath = Environment.CurrentDirectory + "\\Config\\Device.ini";
+        private string devicePath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Device.ini";
 
         //通信组参数路径
-        private string groupPath = Environment.CurrentDirectory + "\\Config\\Group.xlsx";
+        private string groupPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Group.xlsx";
 
         //变量路径
-        private string variablePath = Environment.CurrentDirectory + "\\Config\\Variable.xlsx";
+        private string variablePath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Variable.xlsx";
 
         //大小端
         private DataFormat dataFormat = DataFormat.ABCD;
@@ -105,25 +105,25 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         private void StoreTimer_Elapsed(object sender, EventArgs e)
         {
             //定时存储
-            if (CommonMethods.Device.IsConnected)
+            if (CommonMethods.Device != null && CommonMethods.Device.IsConnected)
             {
                 if (CommonMethods.Device["模块1温度"] != null)
                 {
                     new ActualDataManage().AddActualData(new ActualData()
                     {
                         InsertTime = CurrentTime,
-                        Station1Temp = CommonMethods.Device.CurrentValue["模块1温度"]?.ToString(),
-                        Station1Humidity = CommonMethods.Device.CurrentValue["模块1湿度"]?.ToString(),
-                        Station2Temp = CommonMethods.Device.CurrentValue["模块2温度"]?.ToString(),
-                        Station2Humidity = CommonMethods.Device.CurrentValue["模块2湿度"]?.ToString(),
-                        Station3Temp = CommonMethods.Device.CurrentValue["模块3温度"]?.ToString(),
-                        Station3Humidity = CommonMethods.Device.CurrentValue["模块3湿度"]?.ToString(),
-                        Station4Temp = CommonMethods.Device.CurrentValue["模块4温度"]?.ToString(),
-                        Station4Humidity = CommonMethods.Device.CurrentValue["模块4湿度"]?.ToString(),
-                        Station5Temp = CommonMethods.Device.CurrentValue["模块5温度"]?.ToString(),
-                        Station5Humidity = CommonMethods.Device.CurrentValue["模块5湿度"]?.ToString(),
-                        Station6Temp = CommonMethods.Device.CurrentValue["模块6温度"]?.ToString(),
-                        Station6Humidity = CommonMethods.Device.CurrentValue["模块6湿度"]?.ToString(),
+                        Station1Temp = CommonMethods.Device.CurrentValue.ContainsKey("模块1温度") ? CommonMethods.Device.CurrentValue["模块1温度"]?.ToString() : null,
+                        Station1Humidity = CommonMethods.Device.CurrentValue.ContainsKey("模块1湿度") ? CommonMethods.Device.CurrentValue["模块1湿度"]?.ToString() : null,
+                        Station2Temp = CommonMethods.Device.CurrentValue.ContainsKey("模块2温度") ? CommonMethods.Device.CurrentValue["模块2温度"]?.ToString() : null,
+                        Station2Humidity = CommonMethods.Device.CurrentValue.ContainsKey("模块2湿度") ? CommonMethods.Device.CurrentValue["模块2湿度"]?.ToString() : null,
+                        Station3Temp = CommonMethods.Device.CurrentValue.ContainsKey("模块3温度") ? CommonMethods.Device.CurrentValue["模块3温度"]?.ToString() : null,
+                        Station3Humidity = CommonMethods.Device.CurrentValue.ContainsKey("模块3湿度") ? CommonMethods.Device.CurrentValue["模块3湿度"]?.ToString() : null,
+                        Station4Temp = CommonMethods.Device.CurrentValue.ContainsKey("模块4温度") ? CommonMethods.Device.CurrentValue["模块4温度"]?.ToString() : null,
+                        Station4Humidity = CommonMethods.Device.CurrentValue.ContainsKey("模块4湿度") ? CommonMethods.Device.CurrentValue["模块4湿度"]?.ToString() : null,
+                        Station5Temp = CommonMethods.Device.CurrentValue.ContainsKey("模块5温度") ? CommonMethods.Device.CurrentValue["模块5温度"]?.ToString() : null,
+                        Station5Humidity = CommonMethods.Device.CurrentValue.ContainsKey("模块5湿度") ? CommonMethods.Device.CurrentValue["模块5湿度"]?.ToString() : null,
+                        Station6Temp = CommonMethods.Device.CurrentValue.ContainsKey("模块6温度") ? CommonMethods.Device.CurrentValue["模块6温度"]?.ToString() : null,
+                        Station6Humidity = CommonMethods.Device.CurrentValue.ContainsKey("模块6湿度") ? CommonMethods.Device.CurrentValue["模块6湿度"]?.ToString() : null,
                     });
                 }
             }

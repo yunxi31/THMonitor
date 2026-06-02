@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs;
+using MiniExcelLibs;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -150,7 +150,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// <returns></returns>
         private List<Group> GetAllGroups()
         {
-            var groupPath = Environment.CurrentDirectory + "\\Config\\Group.xlsx";
+            var groupPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Group.xlsx";
             if (!File.Exists(groupPath))
             {
                 return null;
@@ -195,7 +195,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             variable.Offset=this.Offset;
             variable.Remark = this.Remark;
             //重新写入数据
-            var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Variable.xlsx");
+            var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Variable.xlsx");
             MiniExcel.SaveAs(stream, totalVars);
             stream.Close();//不要忘记关闭流
             VarsList = new ObservableCollection<Variable>(GetAllVars());
@@ -208,7 +208,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         private void ExeDelVar(string obj)
         {
             totalVars.RemoveAll(c => c.VarName == obj);
-            var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Variable.xlsx");
+            var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Variable.xlsx");
             MiniExcel.SaveAs(stream, totalVars);
             stream.Close();//不要忘记关闭流
             VarsList = new ObservableCollection<Variable>(GetAllVars());
@@ -240,7 +240,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             try
             {
                 //此处用这种方式写入文件，防止提示文件已存在
-                var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Variable.xlsx");
+                var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Variable.xlsx");
                 MiniExcel.SaveAs(stream, totalVars);
                 stream.Close();//不要忘记关闭流
                 VarsList = new ObservableCollection<Variable>(GetAllVars());
@@ -259,7 +259,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private IEnumerable<Variable> GetAllVars()
         {
-            var varPath = Environment.CurrentDirectory + "\\Config\\Variable.xlsx";
+            var varPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Variable.xlsx";
             if (!File.Exists(varPath))
             {
                 return new List<Variable>();

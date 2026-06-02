@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -93,7 +93,7 @@ namespace thinger.WPF.MultiTHMonitorProject.Views
         //}
 
         #region 软键盘功能
-        private void StartKeyBoard()
+        private async void StartKeyBoard()
         {
             //打开软键盘
             try
@@ -108,10 +108,21 @@ namespace thinger.WPF.MultiTHMonitorProject.Views
                 // 上面的语句在打开软键盘后，系统还没用立刻把软键盘的窗口创建出来了。所以下面的代码用循环来查询窗口是否创建，只有创建了窗口
                 // FindWindow才能找到窗口句柄，才可以移动窗口的位置和设置窗口的大小。这里是关键。
                 IntPtr intptr = IntPtr.Zero;
-                while (IntPtr.Zero == intptr)
+                int attempts = 0;
+                while (IntPtr.Zero == intptr && attempts < 30)
                 {
-                    System.Threading.Thread.Sleep(100);
+                    await Task.Delay(100);
+                    attempts++;
                     intptr = FindWindow(null, "屏幕键盘");
+                    if (intptr == IntPtr.Zero)
+                    {
+                        intptr = FindWindow(null, "On-Screen Keyboard");
+                    }
+                }
+
+                if (intptr == IntPtr.Zero)
+                {
+                    return;
                 }
 
 

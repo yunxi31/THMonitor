@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using MiniExcelLibs;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -105,12 +105,15 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 
             saveFileDialog.Filter = "Xlsx文件(*.xlsx)|*.xlsx|所有文件|*.*";
             saveFileDialog.Title = "导出日志报表";
-            saveFileDialog.FileName = "日志报表" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            saveFileDialog.FileName = "日志报表" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx";
             saveFileDialog.DefaultExt = "xlsx";
             saveFileDialog.AddExtension = true;
 
-            MiniExcel.SaveAs(saveFileDialog.FileName, obj,excelType:ExcelType.XLSX);
-            Process.Start(new ProcessStartInfo {UseShellExecute=true,FileName=saveFileDialog.FileName });
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                MiniExcel.SaveAs(saveFileDialog.FileName, obj, excelType: ExcelType.XLSX);
+                Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
+            }
         }
         private void ExeQueryAlarm()
         {

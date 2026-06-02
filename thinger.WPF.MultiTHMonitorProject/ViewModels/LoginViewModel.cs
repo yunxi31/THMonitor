@@ -1,4 +1,4 @@
-﻿using Prism.Commands;
+using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -68,7 +68,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 		public event Action<IDialogResult> RequestClose;
 		public string Title { get; set; }
 
-        private void ExeLogin(object obj)
+        private async void ExeLogin(object obj)
         {
 			Window loginWindow = obj as Window;
 			if (string.IsNullOrWhiteSpace(LoginName) || string.IsNullOrWhiteSpace(LoginPwd))
@@ -85,7 +85,17 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                     LoginPwd = LoginPwd
                 };
                 //用户查询
-                objAdmin = new SysAdminManage().AdminLogin(objAdmin);
+                try
+                {
+                    LoginTip = "正在登录，请稍候...";
+                    objAdmin = await Task.Run(() => new SysAdminManage().AdminLogin(objAdmin));
+                }
+                catch (Exception ex)
+                {
+                    LoginTip = $"**数据库连接失败: {ex.Message}";
+                    return;
+                }
+
                 if (objAdmin == null)
                 {
 					LoginTip = "**用户名或密码错误,请重新输入!!!";
@@ -95,10 +105,8 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 }
                 else
                 {
-
                     CommonMethods.CurrentAdmin = objAdmin;
                     RequestClose?.Invoke(new DialogResult(ButtonResult.OK));//通知登录成功
-                    
                 }
             }
         }

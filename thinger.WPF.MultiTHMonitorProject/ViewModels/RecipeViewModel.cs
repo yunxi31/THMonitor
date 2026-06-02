@@ -1,4 +1,4 @@
-﻿using ImTools;
+using ImTools;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -42,8 +42,8 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 
 
         #region 成员变量
-        private string BaseRecipe = Environment.CurrentDirectory + "\\Recipe";
-        private string devPath = string.Empty;
+        private string BaseRecipe = AppDomain.CurrentDomain.BaseDirectory + "Recipe";
+        private string devPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Device.ini";
         #endregion
 
         #region 属性

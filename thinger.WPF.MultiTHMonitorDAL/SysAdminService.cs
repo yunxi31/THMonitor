@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -131,23 +131,24 @@ namespace thinger.WPF.MultiTHMonitorDAL
         {
             string sql = "Select LoginId,LoginName,LoginPwd,ParamSet,Recipe,HistoryLog,HistoryTrend,UserManage from SysAdmin";
 
-            SqlDataReader reader = SQLHelper.ExecuteReader(sql);
-
             List<SysAdmin> sysAdmins = new List<SysAdmin>();
 
-            while (reader.Read())
+            using (SqlDataReader reader = SQLHelper.ExecuteReader(sql))
             {
-                sysAdmins.Add(new SysAdmin()
+                while (reader.Read())
                 {
-                    LoginId = Convert.ToInt32(reader["LoginId"]),
-                    LoginName = reader["LoginName"].ToString(),
-                    LoginPwd = reader["LoginPwd"].ToString(),
-                    ParamSet = Convert.ToBoolean(reader["ParamSet"]),
-                    Recipe = Convert.ToBoolean(reader["Recipe"]),
-                    HistoryLog = Convert.ToBoolean(reader["HistoryLog"]),
-                    HistoryTrend = Convert.ToBoolean(reader["HistoryTrend"]),
-                    UserManage = Convert.ToBoolean(reader["UserManage"])
-                });
+                    sysAdmins.Add(new SysAdmin()
+                    {
+                        LoginId = Convert.ToInt32(reader["LoginId"]),
+                        LoginName = reader["LoginName"].ToString(),
+                        LoginPwd = reader["LoginPwd"].ToString(),
+                        ParamSet = Convert.ToBoolean(reader["ParamSet"]),
+                        Recipe = Convert.ToBoolean(reader["Recipe"]),
+                        HistoryLog = Convert.ToBoolean(reader["HistoryLog"]),
+                        HistoryTrend = Convert.ToBoolean(reader["HistoryTrend"]),
+                        UserManage = Convert.ToBoolean(reader["UserManage"])
+                    });
+                }
             }
 
             return sysAdmins;

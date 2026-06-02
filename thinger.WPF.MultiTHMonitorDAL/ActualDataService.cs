@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -112,28 +112,29 @@ namespace thinger.WPF.MultiTHMonitorDAL
                 new SqlParameter("@End",end)
             };
 
-            SqlDataReader reader = SQLHelper.ExecuteReader(stringBuilder.ToString(), param.ToArray());
-
             List<ActualData> actualDatas = new List<ActualData>();
 
-            while (reader.Read())
+            using (SqlDataReader reader = SQLHelper.ExecuteReader(stringBuilder.ToString(), param.ToArray()))
             {
-                actualDatas.Add(new ActualData()
+                while (reader.Read())
                 {
-                    InsertTime = reader["InsertTime"].ToString(),
-                    Station1Temp = reader["Station1Temp"].ToString(),
-                    Station1Humidity = reader["Station1Humidity"].ToString(),
-                    Station2Temp = reader["Station2Temp"].ToString(),
-                    Station2Humidity = reader["Station2Humidity"].ToString(),
-                     Station3Temp = reader["Station3Temp"].ToString(),
-                    Station3Humidity = reader["Station3Humidity"].ToString(),
-                    Station4Temp = reader["Station3Temp"].ToString(),
-                    Station4Humidity = reader["Station3Humidity"].ToString(),
-                    Station5Temp = reader["Station5Temp"].ToString(),
-                    Station5Humidity = reader["Station5Humidity"].ToString(),
-                    Station6Temp = reader["Station6Temp"].ToString(),
-                    Station6Humidity = reader["Station6Humidity"].ToString(),
-                });
+                    actualDatas.Add(new ActualData()
+                    {
+                        InsertTime = reader["InsertTime"].ToString(),
+                        Station1Temp = reader["Station1Temp"].ToString(),
+                        Station1Humidity = reader["Station1Humidity"].ToString(),
+                        Station2Temp = reader["Station2Temp"].ToString(),
+                        Station2Humidity = reader["Station2Humidity"].ToString(),
+                        Station3Temp = reader["Station3Temp"].ToString(),
+                        Station3Humidity = reader["Station3Humidity"].ToString(),
+                        Station4Temp = reader["Station3Temp"].ToString(),
+                        Station4Humidity = reader["Station3Humidity"].ToString(),
+                        Station5Temp = reader["Station5Temp"].ToString(),
+                        Station5Humidity = reader["Station5Humidity"].ToString(),
+                        Station6Temp = reader["Station6Temp"].ToString(),
+                        Station6Humidity = reader["Station6Humidity"].ToString(),
+                    });
+                }
             }
 
             return actualDatas;

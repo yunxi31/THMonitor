@@ -1,4 +1,4 @@
-﻿using LiveChartsCore.SkiaSharpView.Painting;
+using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore;
 using SkiaSharp;
@@ -470,50 +470,51 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         }
         private void ExeSavePicture(CartesianChart chart)
         {
-            
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
             saveFileDialog.Filter = "图片文件(*.jpg)|*.jpg|所有文件|*.*";
-            saveFileDialog.FileName = "趋势保存图片" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            saveFileDialog.FileName = "趋势保存图片" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
 
             saveFileDialog.Title = "历史趋势保存图片";
             saveFileDialog.DefaultExt = "jpg";
             saveFileDialog.AddExtension = true;
-            //Nullable<bool> result = saveFileDialog.ShowDialog();
-            FileStream fs = new FileStream($"{saveFileDialog.FileName}", FileMode.Create);
-            RenderTargetBitmap bmp = new RenderTargetBitmap((int)chart.ActualWidth + 10, (int)chart.ActualHeight + 10, 96, 96, PixelFormats.Pbgra32);
-            bmp.Render(chart);
+            
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                {
+                    RenderTargetBitmap bmp = new RenderTargetBitmap((int)chart.ActualWidth + 10, (int)chart.ActualHeight + 10, 96, 96, PixelFormats.Pbgra32);
+                    bmp.Render(chart);
 
-            BitmapEncoder encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bmp));
-            //保存到路径中
-            encoder.Save(fs);
-            //释放资源
-            fs.Close();
-            fs.Dispose();
-            MessageBox.Show("保存成功");
-            
-            Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
-            
+                    BitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(bmp));
+                    //保存到路径中
+                    encoder.Save(fs);
+                }
+                MessageBox.Show("保存成功");
+                Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
+            }
         }
         private void ExeSaveExcel(CartesianChart obj)
         {
             string start = StartNowDate.ToString("yyyy-MM-dd") + StartNowTime.ToString(" hh:mm:ss");
             string end = EndNowDate.ToString("yyyy-MM-dd") + EndNowTime.ToString(" hh:mm:ss");
-            List<ActualData> actualDatas=  GetActualDatas(start, end);
+            List<ActualData> actualDatas = GetActualDatas(start, end);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
             saveFileDialog.Filter = "CSV文件(*.csv)|*.csv|所有文件|*.*";
-            saveFileDialog.FileName = "趋势保存图片" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            saveFileDialog.FileName = "趋势保存数据" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
 
             saveFileDialog.Title = "历史趋势保存CSV";
             saveFileDialog.DefaultExt = "csv";
             saveFileDialog.AddExtension = true;
 
-            MiniExcel.SaveAs(saveFileDialog.FileName, actualDatas, excelType: ExcelType.CSV);
-            Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
-          
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                MiniExcel.SaveAs(saveFileDialog.FileName, actualDatas, excelType: ExcelType.CSV);
+                Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
+            }
         }
         public List<ActualData> GetActualDatas(string startTime,string endTime)
         {

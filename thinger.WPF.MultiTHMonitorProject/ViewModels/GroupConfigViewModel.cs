@@ -1,4 +1,4 @@
-﻿using MiniExcelLibs;
+using MiniExcelLibs;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -142,7 +142,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             try
             {
                 //此处用这种方式写入文件，防止提示文件已存在
-                var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Group.xlsx");
+                var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Group.xlsx");
                 MiniExcel.SaveAs(stream, totalGroups);
                 stream.Close();//不要忘记关闭流
                 GroupsList = new ObservableCollection<Group>(GetAllGroups());
@@ -163,7 +163,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         private void ExeDelGroup(string obj)
         {
             totalGroups.RemoveAll(c => c.GroupName == obj);
-            var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Group.xlsx");
+            var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Group.xlsx");
             MiniExcel.SaveAs(stream, totalGroups);
             stream.Close();//不要忘记关闭流
             GroupsList = new ObservableCollection<Group>(GetAllGroups());
@@ -181,7 +181,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             group.Remark = this.Remark;
             group.StoreArea = this.SelectStoreArea;
             //重新写入数据
-            var stream = File.Create(Environment.CurrentDirectory + "\\Config\\Group.xlsx");
+            var stream = File.Create(AppDomain.CurrentDomain.BaseDirectory + "Config\\Group.xlsx");
             MiniExcel.SaveAs(stream, totalGroups);
             stream.Close();//不要忘记关闭流
             GroupsList = new ObservableCollection<Group>(GetAllGroups());
@@ -192,7 +192,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// </summary>
         private List<Group> GetAllGroups()
         {
-            var groupPath = Environment.CurrentDirectory + "\\Config\\Group.xlsx";
+            var groupPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\Group.xlsx";
             if (!File.Exists(groupPath))
             {
                 return new List<Group>();
@@ -212,6 +212,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 this.Start = group.Start;
                 this.Length = group.Length;
                 this.Remark = group.Remark;
+                this.SelectStoreArea = group.StoreArea;
             }
         }
         
@@ -234,6 +235,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             this.Start = 0;
             this.Length= 0;
             this.Remark = "";
+            this.SelectStoreArea = null;
         }
         private void ExeCloseGroup(object obj)
         {

@@ -1,11 +1,16 @@
-﻿<Window
+<Window
     x:Class="thinger.WPF.MultiTHMonitorProject.Views.MainView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    WindowState="Maximized"
     Title="{Binding Title}"
-    Width="1920"
+    d:DesignWidth="1920"
+    d:DesignHeight="1080"
     Height="1080"
     prism:ViewModelLocator.AutoWireViewModel="True"
     AllowsTransparency="True"
@@ -84,58 +89,59 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid Background="#05092e">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="128" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <!--  顶部导航  -->
+    <Viewbox Stretch="Uniform">
+        <Grid Background="#05092e" Width="1920" Height="1080">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="128" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!--  顶部导航  -->
 
-        <Grid x:Name="MoveColorZone">
-            <Grid.Background>
-                <ImageBrush ImageSource="/Images/header_bg.png" />
-            </Grid.Background>
-            <StackPanel Orientation="Horizontal">
-                <RadioButton
+            <Grid x:Name="MoveColorZone">
+                <Grid.Background>
+                    <ImageBrush ImageSource="/Images/header_bg.png" />
+                </Grid.Background>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
                     Margin="130,0,10,0"
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="MonitorView"
                     Content="集中监控"
                     IsChecked="True" />
-                <RadioButton
+                    <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="ParamSetView"
                     Content="参数设置" />
-                <RadioButton
+                    <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="RecipeView"
                     Content="配方管理" />
 
-                <RadioButton
+                    <RadioButton
                     Margin="980,0,10,0"
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="AlarmView"
                     Content="报警追溯" />
-                <RadioButton
+                    <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="HistoryView"
                     Content="历史趋势"
                     Cursor="Hand" />
-                <RadioButton
+                    <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="UserManageView"
                     Content="用户管理" />
-            </StackPanel>
-        </Grid>
-        <Grid Grid.Row="1" Margin="20,0,20,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <TextBlock
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1" Margin="20,0,20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock
                     Margin="10,0,0,0"
                     VerticalAlignment="Center"
                     FontSize="16"
@@ -143,50 +149,51 @@
                     <Run Foreground="#fff" Text="欢迎 " />
                     <Run Foreground="#00f7ec" Text="{Binding UserName}" />
                     <Run Foreground="#fff" Text=" 登录系统" />
-                </TextBlock>
-                <TextBlock
+                    </TextBlock>
+                    <TextBlock
                     x:Name="SysTime"
                     Margin="10,0,0,0"
                     VerticalAlignment="Center"
                     FontSize="16"
                     Foreground="#00f7ec"
                     Text="2022年11月25日 15:51:00 星期五" />
-            </StackPanel>
-            <StackPanel
+                </StackPanel>
+                <StackPanel
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
-                <TextBlock
+                    <TextBlock
                     Margin="15,0,0,0"
                     VerticalAlignment="Center"
                     FontSize="16"
                     FontWeight="Bold"
                     Foreground="#fff"
                     Text="通信状态" />
-                <Border
+                    <Border
                     x:Name="ConnectStatusLed"
                     Width="20"
                     Height="20"
                     Margin="10,0,10,0"
                     Background="Red"
                     CornerRadius="10">
-                    <Border.Effect>
-                        <DropShadowEffect
+                        <Border.Effect>
+                            <DropShadowEffect
                             BlurRadius="10"
                             ShadowDepth="0"
                             Color="Red" />
-                    </Border.Effect>
-                </Border>
-                <Button
+                        </Border.Effect>
+                    </Border>
+                    <Button
                     Name="btnClose"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     Content="退出系统"
                     FontSize="16"
                     Style="{StaticResource MaterialDesignFlatMidBgButton}" />
-            </StackPanel>
+                </StackPanel>
+            </Grid>
+            <!--  主内容区  -->
+            <ContentControl Grid.Row="2" prism:RegionManager.RegionName="ContentRegion" />
         </Grid>
-        <!--  主内容区  -->
-        <ContentControl Grid.Row="2" prism:RegionManager.RegionName="ContentRegion" />
-    </Grid>
+    </Viewbox>
 </Window>

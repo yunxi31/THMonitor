@@ -4,6 +4,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
 	  <Nullable>disable</Nullable>
+	  <UserSecretsId>8f2f6269-9a22-4122-a18d-300d51005062</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\header.jpg" />
@@ -22,6 +23,7 @@
     <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.601" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.601" />
     <PackageReference Include="MaterialDesignThemes" Version="4.6.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.2" />
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
   </ItemGroup>
   <ItemGroup>

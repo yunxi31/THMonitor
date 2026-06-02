@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -91,26 +91,27 @@ namespace thinger.WPF.MultiTHMonitorDAL
                 new SqlParameter("@End",end),
             };
 
-            if (alarmType.Length>0)
+            if (!string.IsNullOrEmpty(alarmType))
             {
                 sql += " and AlarmType=@AlarmType";
                 param.Add(new SqlParameter("@AlarmType", alarmType));
             }
 
-            SqlDataReader reader = SQLHelper.ExecuteReader(sql,param.ToArray());
-
             List<SysLog> sysLogs = new List<SysLog>();
 
-            while (reader.Read())
+            using (SqlDataReader reader = SQLHelper.ExecuteReader(sql, param.ToArray()))
             {
-                sysLogs.Add(new SysLog()
+                while (reader.Read())
                 {
-                    InsertTime = reader["InsertTime"].ToString(),
-                    Note = reader["Note"].ToString(),
-                    Operator = reader["Operator"].ToString(),
-                    VarName = reader["VarName"].ToString(),
-                    AlarmType = reader["AlarmType"].ToString()
-                });
+                    sysLogs.Add(new SysLog()
+                    {
+                        InsertTime = reader["InsertTime"].ToString(),
+                        Note = reader["Note"].ToString(),
+                        Operator = reader["Operator"].ToString(),
+                        VarName = reader["VarName"].ToString(),
+                        AlarmType = reader["AlarmType"].ToString()
+                    });
+                }
             }
 
             return sysLogs;
