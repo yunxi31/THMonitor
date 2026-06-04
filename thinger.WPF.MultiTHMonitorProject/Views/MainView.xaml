@@ -107,30 +107,35 @@
                     Margin="130,0,10,0"
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="MonitorView"
-                    Content="集中监控"
-                    IsChecked="True" />
+                    IsChecked="{Binding IsMonitorChecked, Mode=TwoWay}"
+                    Content="集中监控" />
                     <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="ParamSetView"
+                    IsChecked="{Binding IsParamSetChecked, Mode=TwoWay}"
                     Content="参数设置" />
                     <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="RecipeView"
+                    IsChecked="{Binding IsRecipeChecked, Mode=TwoWay}"
                     Content="配方管理" />
 
                     <RadioButton
                     Margin="980,0,10,0"
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="AlarmView"
+                    IsChecked="{Binding IsAlarmChecked, Mode=TwoWay}"
                     Content="报警追溯" />
                     <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="HistoryView"
+                    IsChecked="{Binding IsHistoryChecked, Mode=TwoWay}"
                     Content="历史趋势"
                     Cursor="Hand" />
                     <RadioButton
                     Command="{Binding OpenViewCommand}"
                     CommandParameter="UserManageView"
+                    IsChecked="{Binding IsUserManageChecked, Mode=TwoWay}"
                     Content="用户管理" />
                 </StackPanel>
             </Grid>

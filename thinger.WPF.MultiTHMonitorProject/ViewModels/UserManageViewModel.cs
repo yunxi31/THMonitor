@@ -1,4 +1,4 @@
-﻿using Prism.Commands;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using thinger.WPF.MultiTHMonitorBLL;
 using thinger.WPF.MultiTHMonitorModels.SQL;
+using thinger.WPF.MultiTHMonitorProject.Command;
 
 namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
@@ -161,6 +162,11 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// </summary>
         private void ExeAddUser()
         {
+            if (CommonMethods.CurrentAdmin == null || !CommonMethods.CurrentAdmin.UserManage)
+            {
+                System.Windows.MessageBox.Show("您没有用户管理的新增权限！", "权限提示");
+                return;
+            }
             //此处最好对值做一个非空判断和提醒。
             if (this.LoginPwd==this.ConfirmLoginPwd)
             {
@@ -187,6 +193,11 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// </summary>
         private void ExeDelUser(object obj)
         {
+            if (CommonMethods.CurrentAdmin == null || !CommonMethods.CurrentAdmin.UserManage)
+            {
+                System.Windows.MessageBox.Show("您没有用户管理的删除权限！", "权限提示");
+                return;
+            }
             var result = sysAdminManage.DeleteSysAdmin(Convert.ToInt32(obj));
             if (result > 0)
             {
@@ -218,6 +229,11 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// </summary>
         private void ExeModifyUser()
         {
+            if (CommonMethods.CurrentAdmin == null || !CommonMethods.CurrentAdmin.UserManage)
+            {
+                System.Windows.MessageBox.Show("您没有用户管理的修改权限！", "权限提示");
+                return;
+            }
             if (this.LoginPwd == this.ConfirmLoginPwd)
             {
                 SysAdmin sysAdmin = new SysAdmin()

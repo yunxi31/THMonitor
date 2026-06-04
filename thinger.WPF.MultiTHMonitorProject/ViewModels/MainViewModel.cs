@@ -2,6 +2,7 @@ using MiniExcelLibs;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
+using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,12 +24,13 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
     public class MainViewModel : BindableBase, IConfigureService
     {
-        public MainViewModel() { }
+
         //通过构造函数注入服务依赖
-        public MainViewModel(IRegionManager regionManager)
+        public MainViewModel(IRegionManager regionManager, IDialogService dialogService)
         {
             OpenViewCommand = new DelegateCommand<string>(OpenView);
             this._regionManager = regionManager;
+            this._dialogService = dialogService;
             LoadInfo();
             _timer.Tick+= StoreTimer_Elapsed;
             _timer.Interval = new TimeSpan(0, 0, 1);
@@ -39,6 +41,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         #region 成员变量
         private string _title = "Prism Application";
         private readonly IRegionManager _regionManager;
+        private readonly IDialogService _dialogService;
         private DispatcherTimer _timer = new DispatcherTimer();
         //private CommonDataMethods dataMethods = new CommonDataMethods();
         public List<OperateLog> AddLog=new List<OperateLog>();
@@ -75,6 +78,60 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         {
             get { return _title; }
             set { SetProperty(ref _title, value); }
+        }
+
+        private string _currentView = "MonitorView";
+
+        private bool isMonitorChecked = true;
+        public bool IsMonitorChecked
+        {
+            get { return isMonitorChecked; }
+            set { isMonitorChecked = value; RaisePropertyChanged(); }
+        }
+
+        private bool isParamSetChecked;
+        public bool IsParamSetChecked
+        {
+            get { return isParamSetChecked; }
+            set { isParamSetChecked = value; RaisePropertyChanged(); }
+        }
+
+        private bool isRecipeChecked;
+        public bool IsRecipeChecked
+        {
+            get { return isRecipeChecked; }
+            set { isRecipeChecked = value; RaisePropertyChanged(); }
+        }
+
+        private bool isAlarmChecked;
+        public bool IsAlarmChecked
+        {
+            get { return isAlarmChecked; }
+            set { isAlarmChecked = value; RaisePropertyChanged(); }
+        }
+
+        private bool isHistoryChecked;
+        public bool IsHistoryChecked
+        {
+            get { return isHistoryChecked; }
+            set { isHistoryChecked = value; RaisePropertyChanged(); }
+        }
+
+        private bool isUserManageChecked;
+        public bool IsUserManageChecked
+        {
+            get { return isUserManageChecked; }
+            set { isUserManageChecked = value; RaisePropertyChanged(); }
+        }
+
+        private void SetCheckedView(string viewName)
+        {
+            IsMonitorChecked = viewName == "MonitorView";
+            IsParamSetChecked = viewName == "ParamSetView";
+            IsRecipeChecked = viewName == "RecipeView";
+            IsAlarmChecked = viewName == "AlarmView";
+            IsHistoryChecked = viewName == "HistoryView";
+            IsUserManageChecked = viewName == "UserManageView";
         }
 
         private string iPAddress;
@@ -129,8 +186,58 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             }
         }
 
-         private void OpenView(string obj)
+        private void ShowPermissionWarning(string message)
         {
+            if (_dialogService != null)
+            {
+                var parameters = new DialogParameters();
+                parameters.Add("Title", "权限提示");
+                parameters.Add("Message", message);
+                _dialogService.ShowDialog("PromptView", parameters, null);
+            }
+            else
+            {
+                System.Windows.MessageBox.Show(message, "权限提示", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            }
+        }
+
+        private void OpenView(string obj)
+        {
+            if (CommonMethods.CurrentAdmin != null)
+            {
+                if (obj == "UserManageView" && !CommonMethods.CurrentAdmin.UserManage)
+                {
+                    ShowPermissionWarning("您没有用户权限！");
+                    SetCheckedView(_currentView);
+                    return;
+                }
+                if (obj == "ParamSetView" && !CommonMethods.CurrentAdmin.ParamSet)
+                {
+                    ShowPermissionWarning("您没有参数设置权限！");
+                    SetCheckedView(_currentView);
+                    return;
+                }
+                if (obj == "RecipeView" && !CommonMethods.CurrentAdmin.Recipe)
+                {
+                    ShowPermissionWarning("您没有配方管理权限！");
+                    SetCheckedView(_currentView);
+                    return;
+                }
+                if (obj == "AlarmView" && !CommonMethods.CurrentAdmin.HistoryLog)
+                {
+                    ShowPermissionWarning("您没有报警追溯权限！");
+                    SetCheckedView(_currentView);
+                    return;
+                }
+                if (obj == "HistoryView" && !CommonMethods.CurrentAdmin.HistoryTrend)
+                {
+                    ShowPermissionWarning("您没有历史趋势权限！");
+                    SetCheckedView(_currentView);
+                    return;
+                }
+            }
+            _currentView = obj;
+            SetCheckedView(_currentView);
             //通过区域去设置需要显示的内容
             _regionManager.Regions["ContentRegion"].RequestNavigate(obj);
         }
@@ -414,10 +521,11 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             throw new NotImplementedException();
         }
         
-        //配置显示主窗体中登录的用户名和默认显示的界面
         public void Configure()
         {
             UserName = CommonMethods.CurrentAdmin.LoginName;
+            _currentView = "MonitorView";
+            SetCheckedView(_currentView);
             NavigationParameters keys = new NavigationParameters();
             keys.Add("AddLogList",AddLog);
             _regionManager.Regions["ContentRegion"].RequestNavigate("MonitorView",keys);

@@ -25,6 +25,7 @@ namespace thinger.WPF.MultiTHMonitorProject
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterDialog<LoginView, LoginViewModel>();
+            containerRegistry.RegisterDialog<PromptView, PromptViewModel>();
             containerRegistry.RegisterForNavigation<MonitorView, MonitorViewModel>();
             containerRegistry.RegisterForNavigation<ParamSetView, ParamSetViewModel>();
             containerRegistry.RegisterForNavigation<RecipeView, RecipeViewModel>();
