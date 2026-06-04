@@ -63,6 +63,8 @@ namespace thinger.WPF.MultiTHMonitorDAL
             return cloned;
         }
 
+        #region 同步方法 (Synchronous Methods)
+
         /// <summary>
         /// 通用的高频请求重试执行封装
         /// </summary>
@@ -89,11 +91,10 @@ namespace thinger.WPF.MultiTHMonitorDAL
                 catch (SqlException ex) when (attempt < maxRetries && IsTransient(ex))
                 {
                     System.Diagnostics.Trace.WriteLine($"SQL transient error {ex.Number} on attempt {attempt}. Retrying in {delayMs * attempt}ms...");
-                    System.Threading.Thread.Sleep(delayMs * attempt); // 指数级/递增延迟避让
+                    System.Threading.Thread.Sleep(delayMs * attempt); // 递增避让延迟
                 }
                 catch (SqlException ex)
                 {
-                    // 保留原始的 SqlException 作为 InnerException 抛出，方便上层做细粒度诊断
                     throw new Exception($"执行 SQL 发生数据库异常，SQL: {cmdText}", ex);
                 }
                 catch (Exception ex)
@@ -107,9 +108,6 @@ namespace thinger.WPF.MultiTHMonitorDAL
         /// <summary>
         /// 执行insert、update、delete类型的SQL语句
         /// </summary>
-        /// <param name="cmdText">SQL语句或存储过程名称</param>
-        /// <param name="paramArray">参数数组</param>
-        /// <returns>受影响的行数</returns>
         public static int ExecuteNonQuery(string cmdText, SqlParameter[] paramArray = null)
         {
             return ExecuteWithRetry(cmdText, paramArray, (cmd) => cmd.ExecuteNonQuery());
@@ -304,5 +302,255 @@ namespace thinger.WPF.MultiTHMonitorDAL
             }
             throw new Exception("ExecuteNonQueryByTran 重试后依然失败。");
         }
+
+        #endregion
+
+        #region 异步方法 (Asynchronous Methods)
+
+        /// <summary>
+        /// 通用的高频请求异步重试执行封装
+        /// </summary>
+        private static async Task<T> ExecuteWithRetryAsync<T>(string cmdText, SqlParameter[] paramArray, Func<SqlCommand, Task<T>> action)
+        {
+            const int maxRetries = 3;
+            const int delayMs = 150;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(connString))
+                    using (SqlCommand cmd = new SqlCommand(cmdText, conn))
+                    {
+                        if (paramArray != null)
+                        {
+                            cmd.Parameters.AddRange(CloneParameters(paramArray));
+                        }
+                        await conn.OpenAsync();
+                        return await action(cmd);
+                    }
+                }
+                catch (SqlException ex) when (attempt < maxRetries && IsTransient(ex))
+                {
+                    System.Diagnostics.Trace.WriteLine($"SQL async transient error {ex.Number} on attempt {attempt}. Retrying in {delayMs * attempt}ms...");
+                    await Task.Delay(delayMs * attempt); // 非阻塞式异步延迟
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception($"执行 SQL 发生数据库异常(Async)，SQL: {cmdText}", ex);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"执行 SQL 发生未知异常(Async)，SQL: {cmdText}", ex);
+                }
+            }
+            throw new Exception("数据库操作在重试后依然失败(Async)。");
+        }
+
+        /// <summary>
+        /// 异步执行insert、update、delete类型的SQL语句
+        /// </summary>
+        public static async Task<int> ExecuteNonQueryAsync(string cmdText, SqlParameter[] paramArray = null)
+        {
+            return await ExecuteWithRetryAsync(cmdText, paramArray, async (cmd) => await cmd.ExecuteNonQueryAsync());
+        }
+
+        /// <summary>
+        /// 异步返回单一结果的查询
+        /// </summary>
+        public static async Task<object> ExecuteScalarAsync(string cmdText, SqlParameter[] paramArray = null)
+        {
+            return await ExecuteWithRetryAsync(cmdText, paramArray, async (cmd) => await cmd.ExecuteScalarAsync());
+        }
+
+        /// <summary>
+        /// 异步执行返回一个只读结果集的查询
+        /// </summary>
+        public static async Task<SqlDataReader> ExecuteReaderAsync(string cmdText, SqlParameter[] paramArray = null)
+        {
+            const int maxRetries = 3;
+            const int delayMs = 150;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                SqlConnection conn = null;
+                SqlCommand cmd = null;
+                try
+                {
+                    conn = new SqlConnection(connString);
+                    cmd = new SqlCommand(cmdText, conn);
+                    if (paramArray != null)
+                    {
+                        cmd.Parameters.AddRange(CloneParameters(paramArray));
+                    }
+                    await conn.OpenAsync();
+                    return await cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection);
+                }
+                catch (SqlException ex) when (attempt < maxRetries && IsTransient(ex))
+                {
+                    cmd?.Dispose();
+                    conn?.Dispose();
+                    System.Diagnostics.Trace.WriteLine($"SQL Reader async transient error {ex.Number} on attempt {attempt}. Retrying in {delayMs * attempt}ms...");
+                    await Task.Delay(delayMs * attempt);
+                }
+                catch (SqlException ex)
+                {
+                    cmd?.Dispose();
+                    conn?.Dispose();
+                    throw new Exception($"执行 SqlDataReaderAsync 发生数据库异常，SQL: {cmdText}", ex);
+                }
+                catch (Exception ex)
+                {
+                    cmd?.Dispose();
+                    conn?.Dispose();
+                    throw new Exception($"执行 SqlDataReaderAsync 发生未知异常，SQL: {cmdText}", ex);
+                }
+            }
+            throw new Exception("SqlDataReaderAsync 重试后依然失败。");
+        }
+
+        /// <summary>
+        /// 异步返回包含一张数据表的数据集的查询
+        /// </summary>
+        public static async Task<DataSet> GetDataSetAsync(string sql, string tableName = null)
+        {
+            return await GetDataSetAsync(sql, null, tableName);
+        }
+
+        /// <summary>
+        /// 异步返回包含一张数据表的数据集的查询
+        /// </summary>
+        public static async Task<DataSet> GetDataSetAsync(string sql, SqlParameter[] paramArray = null, string tableName = null)
+        {
+            return await ExecuteWithRetryAsync(sql, paramArray, async (cmd) =>
+            {
+                return await Task.Run(() =>
+                {
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        DataSet ds = new DataSet();
+                        if (tableName == null)
+                            da.Fill(ds);
+                        else
+                            da.Fill(ds, tableName);
+                        return ds;
+                    }
+                });
+            });
+        }
+
+        /// <summary>
+        /// 异步执行查询，返回一个或多个表的DataSet
+        /// </summary>
+        public static async Task<DataSet> GetDataSetAsync(Dictionary<string, string> dicTableAndSql)
+        {
+            const int maxRetries = 3;
+            const int delayMs = 150;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    return await Task.Run(async () =>
+                    {
+                        using (SqlConnection conn = new SqlConnection(connString))
+                        using (SqlCommand cmd = new SqlCommand())
+                        {
+                            cmd.Connection = conn;
+                            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                            {
+                                DataSet ds = new DataSet();
+                                await conn.OpenAsync();
+                                foreach (string tbName in dicTableAndSql.Keys)
+                                {
+                                    cmd.CommandText = dicTableAndSql[tbName];
+                                    da.Fill(ds, tbName);
+                                }
+                                return ds;
+                            }
+                        }
+                    });
+                }
+                catch (SqlException ex) when (attempt < maxRetries && IsTransient(ex))
+                {
+                    System.Diagnostics.Trace.WriteLine($"SQL GetDataSet async transient error {ex.Number} on attempt {attempt}. Retrying in {delayMs * attempt}ms...");
+                    await Task.Delay(delayMs * attempt);
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("执行 GetDataSetAsync(Dictionary) 发生数据库异常", ex);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("执行 GetDataSetAsync(Dictionary) 发生未知异常", ex);
+                }
+            }
+            throw new Exception("GetDataSetAsync(Dictionary) 重试后依然失败。");
+        }
+
+        /// <summary>
+        /// 异步基于事务提交
+        /// </summary>
+        public static async Task<bool> ExecuteNonQueryByTranAsync(string sql, List<SqlParameter[]> paramArrayList)
+        {
+            const int maxRetries = 3;
+            const int delayMs = 150;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                SqlConnection conn = null;
+                SqlTransaction transaction = null;
+                try
+                {
+                    conn = new SqlConnection(connString);
+                    await conn.OpenAsync();
+                    transaction = conn.BeginTransaction();
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn, transaction))
+                    {
+                        foreach (SqlParameter[] param in paramArrayList)
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.AddRange(CloneParameters(param));
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    transaction.Commit();
+                    return true;
+                }
+                catch (SqlException ex) when (attempt < maxRetries && IsTransient(ex))
+                {
+                    try { transaction?.Rollback(); } catch { }
+                    transaction?.Dispose();
+                    conn?.Dispose();
+
+                    System.Diagnostics.Trace.WriteLine($"SQL Transaction async transient error {ex.Number} on attempt {attempt}. Retrying in {delayMs * attempt}ms...");
+                    await Task.Delay(delayMs * attempt);
+                }
+                catch (SqlException ex)
+                {
+                    try { transaction?.Rollback(); } catch { }
+                    transaction?.Dispose();
+                    conn?.Dispose();
+                    throw new Exception("ExecuteNonQueryByTranAsync 发生数据库事务异常", ex);
+                }
+                catch (Exception ex)
+                {
+                    try { transaction?.Rollback(); } catch { }
+                    transaction?.Dispose();
+                    conn?.Dispose();
+                    throw new Exception("ExecuteNonQueryByTranAsync 发生未知事务异常", ex);
+                }
+                finally
+                {
+                    transaction?.Dispose();
+                    conn?.Dispose();
+                }
+            }
+            throw new Exception("ExecuteNonQueryByTranAsync 重试后依然失败。");
+        }
+
+        #endregion
     }
 }
