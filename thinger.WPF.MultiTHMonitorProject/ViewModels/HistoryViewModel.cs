@@ -26,7 +26,7 @@ using System.Windows.Controls;
 
 namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
-    public class HistoryViewModel:BindableBase
+    public class HistoryViewModel:BindableBase, INavigationAware
     {
         public HistoryViewModel()
         {
@@ -452,21 +452,54 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         #endregion
 
         #region 方法
+        private void ClearHistoryData()
+        {
+            Values_Temp01.Clear();
+            Values_Hum01.Clear();
+            Values_Temp02.Clear();
+            Values_Hum02.Clear();
+            Values_Temp03.Clear();
+            Values_Hum03.Clear();
+            Values_Temp04.Clear();
+            Values_Hum04.Clear();
+            Values_Temp05.Clear();
+            Values_Hum05.Clear();
+            Values_Temp06.Clear();
+            Values_Hum06.Clear();
+            HistoryTimes.Clear();
+        }
+
         private void ExeQueryByTime()
         {
             string start = StartNowDate.ToString("yyyy-MM-dd") + StartNowTime.ToString(" hh:mm:ss");
             string end = EndNowDate.ToString("yyyy-MM-dd") + EndNowTime.ToString(" hh:mm:ss");
-            GetActualDatas(start,end);
-            GetXAxis();
-            GetData();
+            Task.Run(() =>
+            {
+                var data = new ActualDataManage().QueryActualDataByTime(start, end);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ActualDatas = data;
+                    ClearHistoryData();
+                    GetXAxis();
+                    GetData();
+                });
+            });
         }
         private void ExeQueryByFast()
         {
             string start = DateTime.Now.AddHours(-2.0f).ToString();
             string end = DateTime.Now.ToString();
-            GetActualDatas(start, end);
-            GetXAxis();
-            GetData();
+            Task.Run(() =>
+            {
+                var data = new ActualDataManage().QueryActualDataByTime(start, end);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ActualDatas = data;
+                    ClearHistoryData();
+                    GetXAxis();
+                    GetData();
+                });
+            });
         }
         private void ExeSavePicture(CartesianChart chart)
         {
@@ -481,40 +514,59 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             
             if (saveFileDialog.ShowDialog() == true)
             {
-                using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                string fileName = saveFileDialog.FileName;
+                var width = chart.ActualWidth;
+                var height = chart.ActualHeight;
+                Task.Run(() =>
                 {
-                    RenderTargetBitmap bmp = new RenderTargetBitmap((int)chart.ActualWidth + 10, (int)chart.ActualHeight + 10, 96, 96, PixelFormats.Pbgra32);
-                    bmp.Render(chart);
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                        {
+                            RenderTargetBitmap bmp = new RenderTargetBitmap((int)width + 10, (int)height + 10, 96, 96, PixelFormats.Pbgra32);
+                            bmp.Render(chart);
 
-                    BitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(bmp));
-                    //保存到路径中
-                    encoder.Save(fs);
-                }
-                MessageBox.Show("保存成功");
-                Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
+                            BitmapEncoder encoder = new PngBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(bmp));
+                            //保存到路径中
+                            encoder.Save(fs);
+                        }
+                    });
+                    MessageBox.Show("保存成功");
+                    Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = fileName });
+                });
             }
         }
         private void ExeSaveExcel(CartesianChart obj)
         {
             string start = StartNowDate.ToString("yyyy-MM-dd") + StartNowTime.ToString(" hh:mm:ss");
             string end = EndNowDate.ToString("yyyy-MM-dd") + EndNowTime.ToString(" hh:mm:ss");
-            List<ActualData> actualDatas = GetActualDatas(start, end);
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-
-            saveFileDialog.Filter = "CSV文件(*.csv)|*.csv|所有文件|*.*";
-            saveFileDialog.FileName = "趋势保存数据" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
-
-            saveFileDialog.Title = "历史趋势保存CSV";
-            saveFileDialog.DefaultExt = "csv";
-            saveFileDialog.AddExtension = true;
-
-            if (saveFileDialog.ShowDialog() == true)
+            
+            Task.Run(() =>
             {
-                MiniExcel.SaveAs(saveFileDialog.FileName, actualDatas, excelType: ExcelType.CSV);
-                Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
-            }
+                List<ActualData> actualDatas = new ActualDataManage().QueryActualDataByTime(start, end);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+                    saveFileDialog.Filter = "CSV文件(*.csv)|*.csv|所有文件|*.*";
+                    saveFileDialog.FileName = "趋势保存数据" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+
+                    saveFileDialog.Title = "历史趋势保存CSV";
+                    saveFileDialog.DefaultExt = "csv";
+                    saveFileDialog.AddExtension = true;
+
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        string fileName = saveFileDialog.FileName;
+                        Task.Run(() =>
+                        {
+                            MiniExcel.SaveAs(fileName, actualDatas, excelType: ExcelType.CSV);
+                            Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = fileName });
+                        });
+                    }
+                });
+            });
         }
         public List<ActualData> GetActualDatas(string startTime,string endTime)
         {
@@ -676,5 +728,19 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
        
         #endregion
 
+        #region INavigationAware
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+        }
+        #endregion
     }
 }

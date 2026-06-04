@@ -21,7 +21,7 @@ using thinger.WPF.MultiTHMonitorProject.Events;
 
 namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
-    public class ParamSetViewModel:BindableBase
+    public class ParamSetViewModel:BindableBase, INavigationAware
     {
         //public ParamSetViewModel(){}
         //此处利用构造函数注入一个弹窗服务依赖
@@ -1130,6 +1130,22 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                     IsAlarmHum06 = Convert.ToBoolean(CommonMethods.Device["模块6湿度报警启用"]);
                 }
             }
+        }
+        #endregion
+
+        #region INavigationAware
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            GetLimitParam();
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
         #endregion
     }

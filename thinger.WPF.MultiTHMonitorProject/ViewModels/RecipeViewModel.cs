@@ -1,6 +1,7 @@
 using ImTools;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ using thinger.WPF.MultiTHMonitorProject.Command;
 
 namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
-    public class RecipeViewModel : BindableBase
+    public class RecipeViewModel : BindableBase, INavigationAware
     {
         public RecipeViewModel()
         {
@@ -26,7 +27,14 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             SelectRecipeCommand = new DelegateCommand<string>(ExeSelectRecipe);
             ModifyRecipeCommand = new DelegateCommand<string>(ExeModifyRecipe);
             this.CurrentRecipeName = CommonMethods.Device.CurrentRecipe;
-            RefreshRecipe();
+            Task.Run(() =>
+            {
+                var recipes = GetAllRecipe();
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    RecipeInfos = recipes;
+                });
+            });
         }
 
        
@@ -407,28 +415,42 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 RecipeName=this.RecipeName,
                 RecipeParams=new List<RecipeParam>()
                 {
-                    new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp01),TempLow=Convert.ToSingle(StateLTemp01),HumidityHigh=Convert.ToSingle(StateHHum01),HumidityLow=Convert.ToSingle(StateHHum01),TempAlarmEnable=IsAlarmTemp01,HumidityAlarmEnable=IsAlarmHum01},
-                new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp02),TempLow=Convert.ToSingle(StateLTemp02),HumidityHigh=Convert.ToSingle(StateHHum02),HumidityLow=Convert.ToSingle(StateHHum02),TempAlarmEnable=IsAlarmTemp02,HumidityAlarmEnable=IsAlarmHum02},
-                 new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp03),TempLow=Convert.ToSingle(StateLTemp03),HumidityHigh=Convert.ToSingle(StateHHum03),HumidityLow=Convert.ToSingle(StateHHum03),TempAlarmEnable=IsAlarmTemp03,HumidityAlarmEnable=IsAlarmHum03},
-                  new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp04),TempLow=Convert.ToSingle(StateLTemp04),HumidityHigh=Convert.ToSingle(StateHHum04),HumidityLow=Convert.ToSingle(StateHHum04),TempAlarmEnable=IsAlarmTemp04,HumidityAlarmEnable=IsAlarmHum04},
-                   new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp05),TempLow=Convert.ToSingle(StateLTemp05),HumidityHigh=Convert.ToSingle(StateHHum05),HumidityLow=Convert.ToSingle(StateHHum05),TempAlarmEnable=IsAlarmTemp05,HumidityAlarmEnable=IsAlarmHum05},
-                    new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp06),TempLow=Convert.ToSingle(StateLTemp06),HumidityHigh=Convert.ToSingle(StateHHum06),HumidityLow=Convert.ToSingle(StateHHum06),TempAlarmEnable=IsAlarmTemp06,HumidityAlarmEnable=IsAlarmHum06}
+                    new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp01),TempLow=Convert.ToSingle(StateLTemp01),HumidityHigh=Convert.ToSingle(StateHHum01),HumidityLow=Convert.ToSingle(StateLHum01),TempAlarmEnable=IsAlarmTemp01,HumidityAlarmEnable=IsAlarmHum01},
+                new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp02),TempLow=Convert.ToSingle(StateLTemp02),HumidityHigh=Convert.ToSingle(StateHHum02),HumidityLow=Convert.ToSingle(StateLHum02),TempAlarmEnable=IsAlarmTemp02,HumidityAlarmEnable=IsAlarmHum02},
+                 new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp03),TempLow=Convert.ToSingle(StateLTemp03),HumidityHigh=Convert.ToSingle(StateHHum03),HumidityLow=Convert.ToSingle(StateLHum03),TempAlarmEnable=IsAlarmTemp03,HumidityAlarmEnable=IsAlarmHum03},
+                  new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp04),TempLow=Convert.ToSingle(StateLTemp04),HumidityHigh=Convert.ToSingle(StateHHum04),HumidityLow=Convert.ToSingle(StateLHum04),TempAlarmEnable=IsAlarmTemp04,HumidityAlarmEnable=IsAlarmHum04},
+                   new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp05),TempLow=Convert.ToSingle(StateLTemp05),HumidityHigh=Convert.ToSingle(StateHHum05),HumidityLow=Convert.ToSingle(StateLHum05),TempAlarmEnable=IsAlarmTemp05,HumidityAlarmEnable=IsAlarmHum05},
+                    new RecipeParam(){TempHigh=Convert.ToSingle(StateHTemp06),TempLow=Convert.ToSingle(StateLTemp06),HumidityHigh=Convert.ToSingle(StateHHum06),HumidityLow=Convert.ToSingle(StateLHum06),TempAlarmEnable=IsAlarmTemp06,HumidityAlarmEnable=IsAlarmHum06}
                 }
             };
-          var result=  AddRecipe(recipeInfo);
-            if (result)
+            Task.Run(() =>
             {
-                RefreshRecipe();
-            }
+                var result = AddRecipe(recipeInfo);
+                if (result)
+                {
+                    var recipes = GetAllRecipe();
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        RecipeInfos = recipes;
+                    });
+                }
+            });
         }
         
         private void ExeDelRececipe(string obj)
         {
-           var result= DeleteRecipe(obj);
-            if (result)
+            Task.Run(() =>
             {
-                RefreshRecipe();
-            }
+                var result = DeleteRecipe(obj);
+                if (result)
+                {
+                    var recipes = GetAllRecipe();
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        RecipeInfos = recipes;
+                    });
+                }
+            });
         }
         private void ExeSelectRecipe(string obj)
         {
@@ -510,19 +532,24 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 values.Add(Convert.ToInt16(recipeInfo.RecipeParams[i].HumidityAlarmEnable ? 1 : 0));
             }
 
-            bool result = CommonMethods.Modbus.PreSetMultiRegisters(36, ByteArrayLib.GetByteArrayFromShortArray(values.ToArray()));
-
-            if (result)
+            Task.Run(() =>
             {
-                IniConfigHelper.WriteIniData("设备参数", "当前配方", obj, devPath);
-                CurrentRecipeName =obj;
-                CommonMethods.Device.CurrentRecipe = obj;
-                MessageBox.Show("配方加载成功!");
-            }
-            else
-            {
-                MessageBox.Show("配方加载失败!");
-            }
+                bool result = CommonMethods.Modbus.PreSetMultiRegisters(36, ByteArrayLib.GetByteArrayFromShortArray(values.ToArray()));
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (result)
+                    {
+                        IniConfigHelper.WriteIniData("设备参数", "当前配方", obj, devPath);
+                        CurrentRecipeName = obj;
+                        CommonMethods.Device.CurrentRecipe = obj;
+                        MessageBox.Show("配方加载成功!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("配方加载失败!");
+                    }
+                });
+            });
         }
         private void ExeModifyRecipe(string obj)
         {
@@ -538,15 +565,22 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 
             if (recipe != null)
             {
-                if (AddRecipe(recipe))
+                Task.Run(() =>
                 {
-                    MessageBox.Show("配方保存成功！");
-                    RefreshRecipe();
-                }
-                else
-                {
-                    MessageBox.Show("配方保存失败！");
-                }
+                    bool success = AddRecipe(recipe);
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (success)
+                        {
+                            MessageBox.Show("配方保存成功！");
+                            RefreshRecipe();
+                        }
+                        else
+                        {
+                            MessageBox.Show("配方保存失败！");
+                        }
+                    });
+                });
             }
             else
             {
@@ -559,13 +593,14 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// </summary>
         private void RefreshRecipe()
         {
-            RecipeInfos = GetAllRecipe();
-
-            if (RecipeInfos.Count > 0)
+            Task.Run(() =>
             {
-               //RecipeInfos.
-                //SetRecipeInfo(recipeInfos[index]);
-            }
+                var recipes = GetAllRecipe();
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    RecipeInfos = recipes;
+                });
+            });
         }
 
         /// <summary>
@@ -643,12 +678,12 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 }
                 if (recipeInfo.RecipeParams[5] != null)
                 {
-                    StateHTemp06 = recipeInfo.RecipeParams[6].TempHigh.ToString();
-                    StateHHum06 = recipeInfo.RecipeParams[6].HumidityHigh.ToString();
-                    StateLTemp06 = recipeInfo.RecipeParams[6].TempLow.ToString();
-                    StateLHum06 = recipeInfo.RecipeParams[6].HumidityLow.ToString();
-                    IsAlarmTemp06 = recipeInfo.RecipeParams[6].TempAlarmEnable;
-                    IsAlarmHum06 = recipeInfo.RecipeParams[6].HumidityAlarmEnable;
+                    StateHTemp06 = recipeInfo.RecipeParams[5].TempHigh.ToString();
+                    StateHHum06 = recipeInfo.RecipeParams[5].HumidityHigh.ToString();
+                    StateLTemp06 = recipeInfo.RecipeParams[5].TempLow.ToString();
+                    StateLHum06 = recipeInfo.RecipeParams[5].HumidityLow.ToString();
+                    IsAlarmTemp06 = recipeInfo.RecipeParams[5].TempAlarmEnable;
+                    IsAlarmHum06 = recipeInfo.RecipeParams[5].HumidityAlarmEnable;
                 }
             }
         }
@@ -705,7 +740,30 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             return true;
         }
 
-        
+        #endregion
+
+        #region INavigationAware
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            this.CurrentRecipeName = CommonMethods.Device.CurrentRecipe;
+            Task.Run(() =>
+            {
+                var recipes = GetAllRecipe();
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    RecipeInfos = recipes;
+                });
+            });
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+        }
         #endregion
     }
 }

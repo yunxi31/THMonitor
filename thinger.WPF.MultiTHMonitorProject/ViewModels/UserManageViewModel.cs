@@ -1,5 +1,6 @@
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +13,7 @@ using thinger.WPF.MultiTHMonitorProject.Command;
 
 namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
-    public class UserManageViewModel:BindableBase
+    public class UserManageViewModel:BindableBase, INavigationAware
     {
         
         private SysAdminManage sysAdminManage = new SysAdminManage();
@@ -131,8 +132,14 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
         /// </summary>
         private void QueryUser()
         {
-            SysAdmins = new ObservableCollection<SysAdmin>(sysAdminManage.QuerySysAdmins());
-            
+            Task.Run(() =>
+            {
+                var admins = sysAdminManage.QuerySysAdmins();
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SysAdmins = new ObservableCollection<SysAdmin>(admins);
+                });
+            });
         }
 
         /// <summary>
@@ -167,7 +174,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 System.Windows.MessageBox.Show("您没有用户管理的新增权限！", "权限提示");
                 return;
             }
-            //此处最好对值做一个非空判断和提醒。
+            //此处最好对值做一个非空判断 and 提醒。
             if (this.LoginPwd==this.ConfirmLoginPwd)
             {
                 SysAdmin sysAdmin = new SysAdmin()
@@ -180,12 +187,18 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                     Recipe = this.RecipeCheckedVal,
                     UserManage = this.UserManageCheckedVal
                 };
-               var result= sysAdminManage.AddSysAdmin(sysAdmin);
-                if (result>0)
+                Task.Run(() =>
                 {
-                   QueryUser();
-                }
-                Clear();
+                    var result = sysAdminManage.AddSysAdmin(sysAdmin);
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (result > 0)
+                        {
+                            QueryUser();
+                        }
+                        Clear();
+                    });
+                });
             }
         }
         /// <summary>
@@ -198,11 +211,17 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 System.Windows.MessageBox.Show("您没有用户管理的删除权限！", "权限提示");
                 return;
             }
-            var result = sysAdminManage.DeleteSysAdmin(Convert.ToInt32(obj));
-            if (result > 0)
+            Task.Run(() =>
             {
-                QueryUser();
-            }
+                var result = sysAdminManage.DeleteSysAdmin(Convert.ToInt32(obj));
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (result > 0)
+                    {
+                        QueryUser();
+                    }
+                });
+            });
         }
         /// <summary>
         /// 选中一行，将其给文本输入框等赋值。
@@ -247,12 +266,18 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                     Recipe = this.RecipeCheckedVal,
                     UserManage = this.UserManageCheckedVal
                 };
-                var result = sysAdminManage.ModifySysAdmin(sysAdmin);
-                if (result > 0)
+                Task.Run(() =>
                 {
-                    QueryUser();
-                }
-                Clear();
+                    var result = sysAdminManage.ModifySysAdmin(sysAdmin);
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (result > 0)
+                        {
+                            QueryUser();
+                        }
+                        Clear();
+                    });
+                });
             }
             
         }
@@ -265,6 +290,22 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             HistoryLogCheckedVal = false;
             RecipeCheckedVal = false;
             UserManageCheckedVal = false;
+        }
+        #endregion
+
+        #region INavigationAware
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            QueryUser();
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
         #endregion
 

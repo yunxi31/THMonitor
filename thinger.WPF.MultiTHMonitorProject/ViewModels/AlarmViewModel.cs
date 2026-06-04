@@ -2,6 +2,7 @@ using Microsoft.Win32;
 using MiniExcelLibs;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ using thinger.WPF.MultiTHMonitorModels.SQL;
 
 namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 {
-    public class AlarmViewModel:BindableBase
+    public class AlarmViewModel:BindableBase, INavigationAware
     {
         public AlarmViewModel()
         {
@@ -111,8 +112,12 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                MiniExcel.SaveAs(saveFileDialog.FileName, obj, excelType: ExcelType.XLSX);
-                Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = saveFileDialog.FileName });
+                string fileName = saveFileDialog.FileName;
+                Task.Run(() =>
+                {
+                    MiniExcel.SaveAs(fileName, obj, excelType: ExcelType.XLSX);
+                    Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = fileName });
+                });
             }
         }
         private void ExeQueryAlarm()
@@ -122,8 +127,14 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 
             string alarmType = SelectAlarmType == "全部" ? "" : SelectAlarmType;
 
-            List<SysLog> operateResult= new SysLogManage().QuerySysLogByCondition(start, end, alarmType);
-            SysLogs = operateResult;
+            Task.Run(() =>
+            {
+                List<SysLog> operateResult= new SysLogManage().QuerySysLogByCondition(start, end, alarmType);
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SysLogs = operateResult;
+                });
+            });
         }
       
 
@@ -162,6 +173,21 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
                 ts.Add(t);
             }
             return ts;
+        }
+        #endregion
+
+        #region INavigationAware
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
         #endregion
     }
