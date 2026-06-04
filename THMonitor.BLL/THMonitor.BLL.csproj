@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+	  <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>thinger.WPF.MultiTHMonitorBLL</AssemblyName>
+    <RootNamespace>thinger.WPF.MultiTHMonitorBLL</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\THMonitor.DAL\THMonitor.DAL.csproj" />
+  </ItemGroup>
+
+</Project>

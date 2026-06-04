@@ -1,10 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
 	  <Nullable>disable</Nullable>
 	  <UserSecretsId>8f2f6269-9a22-4122-a18d-300d51005062</UserSecretsId>
+    <AssemblyName>thinger.WPF.MultiTHMonitorProject</AssemblyName>
+    <RootNamespace>thinger.WPF.MultiTHMonitorProject</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\header.jpg" />
@@ -27,11 +29,11 @@
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\thinger.DataConvertLib\thinger.DataConvertLib.csproj" />
-    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorBLL\thinger.WPF.MultiTHMonitorBLL.csproj" />
-    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorDAL\thinger.WPF.MultiTHMonitorDAL.csproj" />
-    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorHelper\thinger.WPF.MultiTHMonitorHelper.csproj" />
-    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorModels\thinger.WPF.MultiTHMonitorModels.csproj" />
+    <ProjectReference Include="..\DataConvertLib\DataConvertLib.csproj" />
+    <ProjectReference Include="..\THMonitor.BLL\THMonitor.BLL.csproj" />
+    <ProjectReference Include="..\THMonitor.DAL\THMonitor.DAL.csproj" />
+    <ProjectReference Include="..\THMonitor.Helper\THMonitor.Helper.csproj" />
+    <ProjectReference Include="..\THMonitor.Models\THMonitor.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\header.jpg" />

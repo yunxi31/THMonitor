@@ -5,6 +5,8 @@
     <UseWPF>true</UseWPF>
 	  <Nullable>disable</Nullable>
 	  <UserSecretsId>2998ad9d-c5c8-482f-ae0b-afa56af0e80a</UserSecretsId>
+    <AssemblyName>thinger.WPF.MultiTHMonitorDAL</AssemblyName>
+    <RootNamespace>thinger.WPF.MultiTHMonitorDAL</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\thinger.WPF.MultiTHMonitorModels\thinger.WPF.MultiTHMonitorModels.csproj" />
+    <ProjectReference Include="..\THMonitor.Models\THMonitor.Models.csproj" />
   </ItemGroup>
 
 </Project>

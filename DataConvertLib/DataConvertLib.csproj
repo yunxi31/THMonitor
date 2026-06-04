@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>thinger.DataConvertLib</AssemblyName>
+    <RootNamespace>thinger.DataConvertLib</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\THMonitor.Helper\THMonitor.Helper.csproj" />
+    <ProjectReference Include="..\THMonitor.Models\THMonitor.Models.csproj" />
+  </ItemGroup>
+
+</Project>

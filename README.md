@@ -12,7 +12,7 @@
 *   **UI 框架 & 控件库**：Material Design In XAML Toolkit
 *   **数据可视化**：LiveChartsCore.SkiaSharpView.WPF (仪表盘、历史与实时双向曲线渲染)
 *   **工业通信协议**：自定义 Modbus TCP 客户端驱动 (支持输入线圈、输出线圈、输入寄存器、输出寄存器)
-*   **数据转换引擎**：`thinger.DataConvertLib` (支持 ABCD/DCBA/BADC/CDAB 等多种大小端格式转换与点位线性系数缩放)
+*   **数据转换引擎**：`DataConvertLib` (支持 ABCD/DCBA/BADC/CDAB 等多种大小端格式转换与点位线性系数缩放)
 *   **数据持久化**：Microsoft.Data.SqlClient (面向 SQL Server) + 事务处理机制
 *   **高频数据库访问优化**：支持瞬态故障判定、退避指数级重试逻辑与克隆 SqlParameter 防异常机制
 *   **配置解析器**：MiniExcel (用于 Excel 格式点位的高速动态解析)
@@ -26,28 +26,28 @@
 ```
 thinger.WPF.MultiTHMonitorProject/
 │
-├── thinger.WPF.MultiTHMonitorProject/   # 主程序/外壳层 (WPF / Prism App)
+├── THMonitor.App/                      # 主程序/外壳层 (WPF / Prism App)
 │   ├── Views/                          # 系统视图组件 (MonitorView, AlarmView, RecipeView, HistoryView 等)
 │   ├── ViewModels/                     # 视图模型层 (负责 UI 交互、LiveCharts 数据更新及 Prism 导航参数透传)
 │   └── Command/                        # 通用控制方法 (PLC 通信线程管理、数据转换拦截等)
 │
-├── thinger.WPF.MultiTHMonitorBLL/      # 业务逻辑层 (BLL)
+├── THMonitor.BLL/                      # 业务逻辑层 (BLL)
 │   └── 负责控制各业务功能的流转与事务逻辑校验
 │
-├── thinger.WPF.MultiTHMonitorDAL/      # 数据访问层 (DAL)
+├── THMonitor.DAL/                      # 数据访问层 (DAL)
 │   ├── SQLHelper.cs                    # 深度优化的数据库交互核心 (支持异步重试、高并发缓冲与事务控制)
 │   └── SysAdminService/SysLogService   # 用户信息、系统日志与温湿度记录持久化服务
 │
-├── thinger.WPF.MultiTHMonitorModels/   # 数据模型层
+├── THMonitor.Models/                   # 数据模型层
 │   ├── Config/                         # 变量/设备配置模型
 │   ├── Recipe/                         # 配方数据模型
 │   └── SQL/                            # SQL 数据库实体定义
 │
-├── thinger.WPF.MultiTHMonitorHelper/   # 工业驱动与工具辅助层
+├── THMonitor.Helper/                   # 工业驱动与工具辅助层
 │   ├── ModbusTCP.cs                    # Modbus TCP 标准客户端底层驱动
 │   └── IniConfigHelper.cs              # INI 设备物理配置文件读取助手
 │
-└── thinger.DataConvertLib/             # 高性能数据解析核心库
+└── DataConvertLib/                     # 高性能数据解析核心库
     ├── ByteArrayLib.cs                 # 字节流拆装与逆序重组引擎
     └── MigrationLib.cs                 # 点位线性偏移值计算与工程值转换层
 ```
@@ -74,7 +74,7 @@ thinger.WPF.MultiTHMonitorProject/
   使用 MiniExcel 解析，定义通信组寄存器区域 (输入线圈/输出线圈/输入寄存器/输出寄存器) 及变量名、寄存器地址、类型、放大缩小比例和偏移量。
 
 ### 2. 数据库配置
-在 `thinger.WPF.MultiTHMonitorProject/App.config` 中，配置对应的 `connString` 数据库连接串：
+在 `THMonitor.App/App.config` 中，配置对应的 `connString` 数据库连接串：
 ```xml
 <connectionStrings>
     <add name="connString" connectionString="Data Source=服务器IP;Initial Catalog=数据库名称;User ID=用户名;Password=密码;TrustServerCertificate=True" providerName="System.Data.SqlClient" />
