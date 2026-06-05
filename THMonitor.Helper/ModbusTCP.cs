@@ -686,7 +686,7 @@ namespace thinger.WPF.MultiTHMonitorHelper
         /// <returns></returns>
         private byte SetBitValue(byte src, int bit, bool value)
         {
-            return value ? (byte)(src | (byte)Math.Pow(2, bit)) : (byte)(src & ~(byte)Math.Pow(2, bit));
+            return value ? (byte)(src | (1 << bit)) : (byte)(src & ~(1 << bit));
         }
         #endregion
     }
