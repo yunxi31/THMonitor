@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -541,6 +541,39 @@ namespace thinger.WPF.MultiTHMonitorHelper
         #endregion
 
         #region 通用发送并接收方法
+
+        /// <summary>
+        /// 精确接收指定长度的字节数组
+        /// </summary>
+        private bool ReceiveExact(byte[] buffer, int offset, int size, int timeoutMs)
+        {
+            int bytesRead = 0;
+            int elapsed = 0;
+            int spinInterval = 10;
+            while (bytesRead < size)
+            {
+                if (socket.Available > 0)
+                {
+                    int count = socket.Receive(buffer, offset + bytesRead, size - bytesRead, SocketFlags.None);
+                    if (count == 0)
+                    {
+                        return false; // 连接已断开
+                    }
+                    bytesRead += count;
+                }
+                else
+                {
+                    if (elapsed >= timeoutMs)
+                    {
+                        return false; // 读取超时
+                    }
+                    Thread.Sleep(spinInterval);
+                    elapsed += spinInterval;
+                }
+            }
+            return true;
+        }
+
         /// <summary>
         /// 发送并接收方法
         /// </summary>
@@ -549,53 +582,50 @@ namespace thinger.WPF.MultiTHMonitorHelper
         /// <returns>返回结果</returns>
         private bool SendAndReceive(byte[] send, ref byte[] receive)
         {
-            //加锁
+            // 加锁
             hybirdLock.Enter();
-
-            byte[] buffer = new byte[1024];
-            MemoryStream stream = new MemoryStream();
 
             try
             {
-                //发送报文
-                socket.Send(send, send.Length, SocketFlags.None);
-
-                int timer = 0;
-
-                while (true)
+                // 1. 发送前强行清空（Flush）接收缓冲区中的残留旧数据，防止因上次超时引发的响应错位（粘包）
+                if (socket.Available > 0)
                 {
-                    Thread.Sleep(SleepTime);
-
-                    //判断缓冲区有没有数据
-                    if (socket.Available > 0)
-                    {
-                        //接收数据并放到Buffer
-                        int count = socket.Receive(buffer, SocketFlags.None);
-
-                        //将读取的数据放到Stream中
-                        stream.Write(buffer, 0, count);
-                    }
-                    else
-                    {
-                        timer++;
-                        //先判断Stream有没有数据
-                        if (stream.Length > 0)
-                        {
-                            break;
-                        }
-                        //超时读取
-                        else if (timer > MaxWaitTimes)
-                        {
-                            return false;
-                        }
-                        else if (stream.Length > 0)
-                        {
-                            break;
-                        }
-                    }
+                    byte[] discard = new byte[socket.Available];
+                    socket.Receive(discard, SocketFlags.None);
                 }
 
-                receive = stream.ToArray();
+                // 2. 发送报文
+                socket.Send(send, send.Length, SocketFlags.None);
+
+                // 计算最大允许超时时间（毫秒）
+                int totalTimeout = MaxWaitTimes * SleepTime; 
+
+                // 3. 第一步：精准读取前 6 字节的 MBAP 报文头以获取长度信息
+                byte[] header = new byte[6];
+                if (!ReceiveExact(header, 0, 6, totalTimeout))
+                {
+                    return false;
+                }
+
+                // 4. 第二步：解析后续数据的长度 (Modbus TCP 采用大端序 Big-Endian，第 5、6 字节为长度值)
+                int nextLength = (header[4] << 8) | header[5];
+                if (nextLength <= 0 || nextLength > 250) 
+                {
+                    return false; // 报文长度异常边界过滤
+                }
+
+                // 5. 第三步：精准读取剩余长度的数据
+                byte[] rest = new byte[nextLength];
+                if (!ReceiveExact(rest, 0, nextLength, totalTimeout))
+                {
+                    return false;
+                }
+
+                // 6. 合并数据输出
+                receive = new byte[6 + nextLength];
+                Array.Copy(header, 0, receive, 0, 6);
+                Array.Copy(rest, 0, receive, 6, nextLength);
+
                 return true;
             }
             catch (Exception)
