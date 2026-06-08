@@ -252,7 +252,7 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
             {
                 AddLog.Add(new OperateLog {LogIcon= "AlertCircleCheckOutline",IconColor= "#a0e254", OperateTime =CurrentTime,OperateInfo="配置信息加载成功"});
                 cts = new CancellationTokenSource();
-                //CommonMethods.Device.AlarmTrigEvent += Device_AlarmTrigEvent;
+                CommonMethods.Device.AlarmTrigEvent += Device_AlarmTrigEvent;
 
                 Task.Run(() =>
                 {
@@ -518,7 +518,30 @@ namespace thinger.WPF.MultiTHMonitorProject.ViewModels
 
         private void Device_AlarmTrigEvent(bool arg1, Variable arg2)
         {
-            throw new NotImplementedException();
+            string info = $"{arg2.VarName} ({(arg1 ? "报警触发" : "报警消除")}): {arg2.Remark}";
+
+            // Add to UI log list
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                AddLog.Add(new OperateLog
+                {
+                    LogIcon = arg1 ? "Alert" : "AlertCircleCheckOutline",
+                    IconColor = arg1 ? "Red" : "#a0e254",
+                    OperateTime = CurrentTime,
+                    OperateInfo = info
+                });
+            });
+
+            // Write to SQL Server asynchronously via the background thread
+            SysLog sysLog = new SysLog()
+            {
+                InsertTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                Note = info,
+                AlarmType = arg1 ? "触发" : "消除",
+                Operator = CommonMethods.CurrentAdmin != null ? CommonMethods.CurrentAdmin.LoginName : "System",
+                VarName = arg2.VarName
+            };
+            new SysLogManage().AddSysLog(sysLog);
         }
         
         public void Configure()

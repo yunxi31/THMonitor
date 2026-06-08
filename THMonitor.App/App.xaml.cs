@@ -49,6 +49,7 @@ namespace thinger.WPF.MultiTHMonitorProject
                     Environment.Exit(0);
                     return;
                 }
+                AddLog();
             });
             //通过自定义的配置服务接口，获取需要显示的内容和用户名
             var service = App.Current.MainWindow.DataContext as IConfigureService;

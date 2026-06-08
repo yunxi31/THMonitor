@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,11 +12,37 @@ namespace thinger.WPF.MultiTHMonitorBLL
 {
     public class SysLogManage
     {
+        private static readonly BlockingCollection<SysLog> _logQueue = new BlockingCollection<SysLog>();
         private SysLogService sysLogService = new SysLogService();
+
+        static SysLogManage()
+        {
+            Task.Run(() => ProcessLogQueue());
+        }
+
+        private static void ProcessLogQueue()
+        {
+            var service = new SysLogService();
+            foreach (var log in _logQueue.GetConsumingEnumerable())
+            {
+                try
+                {
+                    service.AddSysLog(log);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to write log to DB asynchronously: {ex.Message}");
+                }
+            }
+        }
 
         public int AddSysLog(SysLog sysLog)
         {
-            return sysLogService.AddSysLog(sysLog);
+            if (sysLog != null)
+            {
+                _logQueue.Add(sysLog);
+            }
+            return 1;
         }
 
         //public DataTable QuerySysLogByCondition(string start, string end, string alarmType)

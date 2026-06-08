@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,6 +52,7 @@ namespace thinger.WPF.MultiTHMonitorModels
             {
                 CurrentValue.Add(variable.VarName, variable.VarValue);
             }
+            CheckAlarm(variable);
         }
 
         /// <summary>
